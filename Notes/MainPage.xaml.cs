@@ -26,6 +26,8 @@ namespace Notes
     /// </summary>
     public sealed partial class MainPage : Notes.Common.LayoutAwarePage
     {
+        private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
+        private Rectangle _confirmRegion;
         private Point _currentPoint;
         private InkManager _inkManager = new InkManager();
         private Brush _lineStroke = new SolidColorBrush(Colors.Green);
@@ -33,21 +35,16 @@ namespace Notes
         private uint _penId;
         private Point _previousPoint;
         private uint _touchId;
-
         public MainPage()
         {
             this.InitializeComponent();
             this.DrawPad.PointerPressed += DrawPad_PointerPressed;
             this.DrawPad.PointerMoved += DrawPad_PointerMoved;
             this.DrawPad.PointerReleased += DrawPad_PointerReleased;
-            this.DrawPad.PointerExited += DrawPad_PointerReleased;
+            this.DrawPad.PointerExited += DrawPad_PointerExited;
+            this.DrawPad.PointerEntered += DrawPad_PointerEntered;
             this.ClearButton.Click += ClearButton_Click;
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
-        }
-
-        void DisplayProperties_OrientationChanged(object sender)
-        {
-            ClearButton_Click(sender, new RoutedEventArgs());
         }
 
         public Double LineThickness
@@ -56,10 +53,69 @@ namespace Notes
             set { _lineThickness = value; }
         }
 
+        private Rectangle ConfirmRegion
+        {
+            get
+            {
+                if (_confirmRegion == null)
+                {
+                    _confirmRegion = new Rectangle
+                    {
+                        Width = 60,
+                        Height = 60,
+                        Fill = new SolidColorBrush(Colors.YellowGreen),
+                    };
+                    _confirmRegion.PointerPressed += ConfirmRegion_PointerPressed;
+                }
+                Size size = DrawPad.RenderSize;
+                _confirmRegion.Margin = new Thickness(size.Width - _confirmRegion.Width, size.Height - _confirmRegion.Height, 0, 0);
+                return _confirmRegion;
+            }
+        }
+
+        void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            // Save Image
+            new MessageDialog("Ready to save Images").ShowAsync();
+        }
+
         private Brush LineStroke
         {
             get { return _lineStroke; }
             set { _lineStroke = value; }
+        }
+
+        private static Path GetPathFromStrokes(InkStroke stroke, Brush brush, double width, double opacity)
+        {
+            if (!_strokeMaps.ContainsKey(stroke))
+            {
+                var renderingStrokes = stroke.GetRenderingSegments();
+
+                // Set up the Path to insert the segments
+                Path path = new Path();
+                path.Data = new PathGeometry();
+                (path.Data as PathGeometry).Figures = new PathFigureCollection();
+                PathFigure pathFigure = new PathFigure();
+                pathFigure.StartPoint = renderingStrokes.First().Position;
+                (path.Data as PathGeometry).Figures.Add(pathFigure);
+
+                // Foreach segment, we add a BezierSegment
+                foreach (var renderStroke in renderingStrokes)
+                {
+                    pathFigure.Segments.Add(new BezierSegment()
+                    {
+                        Point1 = renderStroke.BezierControlPoint1,
+                        Point2 = renderStroke.BezierControlPoint2,
+                        Point3 = renderStroke.Position
+                    });
+                }
+
+                path.StrokeThickness = width;
+                path.Stroke = brush;
+                path.Opacity = opacity;
+                _strokeMaps[stroke] = path;
+            }
+            return _strokeMaps[stroke];
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -67,9 +123,11 @@ namespace Notes
             ClearDrawPad();
             ClearInkStrokes();
         }
+
         private void ClearDrawPad()
         {
             DrawPad.Children.Clear();
+            DrawPad.Children.Add(ConfirmRegion);
         }
 
         private void ClearInkStrokes()
@@ -81,12 +139,30 @@ namespace Notes
             _inkManager.DeleteSelected();
         }
 
+        void DisplayProperties_OrientationChanged(object sender)
+        {
+            ClearButton_Click(sender, new RoutedEventArgs());
+        }
+
         #region DrawPad Actions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private double checkDistance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+        }
+
+        void DrawPad_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            if (!DrawPad.Children.Contains(ConfirmRegion))
+            {
+                DrawPad.Children.Add(ConfirmRegion);
+            }
+        }
+
+        void DrawPad_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            DrawPad_PointerReleased(sender, e);
         }
 
         private void DrawPad_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -96,7 +172,7 @@ namespace Notes
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
                 _currentPoint = pt.Position;
 
-                if (checkDistance(_currentPoint, _previousPoint) > 0.1)
+                if (checkDistance(_currentPoint, _previousPoint) > 2)
                 {
                     Line line = new Line()
                     {
@@ -150,7 +226,7 @@ namespace Notes
             {
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
                 _inkManager.ProcessPointerUp(pt);
-                DrawPad.Children.Clear();
+                ClearDrawPad();
                 foreach (InkStroke stroke in _inkManager.GetStrokes())
                 {
                     RenderStroke(stroke, LineStroke, LineThickness);
@@ -164,48 +240,12 @@ namespace Notes
             _penId = 0;
             e.Handled = true;
         }
-
         #endregion DrawPad Actions
 
         private void RenderStroke(InkStroke stroke, Brush brush, double width, double opacity = 1)
         {
             Path path = GetPathFromStrokes(stroke, brush, width, opacity);
             DrawPad.Children.Add(path);
-        }
-
-        private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
-
-        private static Path GetPathFromStrokes(InkStroke stroke, Brush brush, double width, double opacity)
-        {
-            if (!_strokeMaps.ContainsKey(stroke))
-            {
-                var renderingStrokes = stroke.GetRenderingSegments();
-
-                // Set up the Path to insert the segments
-                Path path = new Path();
-                path.Data = new PathGeometry();
-                (path.Data as PathGeometry).Figures = new PathFigureCollection();
-                PathFigure pathFigure = new PathFigure();
-                pathFigure.StartPoint = renderingStrokes.First().Position;
-                (path.Data as PathGeometry).Figures.Add(pathFigure);
-
-                // Foreach segment, we add a BezierSegment
-                foreach (var renderStroke in renderingStrokes)
-                {
-                    pathFigure.Segments.Add(new BezierSegment()
-                    {
-                        Point1 = renderStroke.BezierControlPoint1,
-                        Point2 = renderStroke.BezierControlPoint2,
-                        Point3 = renderStroke.Position
-                    });
-                }
-
-                path.StrokeThickness = width;
-                path.Stroke = brush;
-                path.Opacity = opacity;
-                _strokeMaps[stroke] = path;
-            }
-            return _strokeMaps[stroke];
         }
     }
 }
