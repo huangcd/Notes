@@ -16,6 +16,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Windows.Graphics.Display;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -73,10 +75,26 @@ namespace Notes
             }
         }
 
-        void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
+        private InMemoryRandomAccessStream mem;
+
+        private async void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            // Save Image
-            new MessageDialog("Ready to save Images").ShowAsync();
+            if (_inkManager.GetStrokes().Count == 0)
+            {
+                return;
+            }
+            mem = new InMemoryRandomAccessStream();
+            await _inkManager.SaveAsync(mem);
+            mem.Seek(0);
+            BitmapImage img = new BitmapImage();
+            img.SetSource(mem);
+            Rectangle rect = new Rectangle
+            {
+                Width = 40,
+                Height = 40,
+                Fill = new ImageBrush { ImageSource = img }
+            };
+            NotePad.Children.Add(rect);
         }
 
         private Brush LineStroke
@@ -85,7 +103,7 @@ namespace Notes
             set { _lineStroke = value; }
         }
 
-        private static Path GetPathFromStrokes(InkStroke stroke, Brush brush, double width, double opacity)
+        private static Path GetPathFromStrokes(InkStroke stroke, Brush brush, double width, double scale = 1, double opacity = 1)
         {
             if (!_strokeMaps.ContainsKey(stroke))
             {
@@ -229,7 +247,7 @@ namespace Notes
                 ClearDrawPad();
                 foreach (InkStroke stroke in _inkManager.GetStrokes())
                 {
-                    RenderStroke(stroke, LineStroke, LineThickness);
+                    RenderStrokeOnDrawPad(stroke, LineStroke, LineThickness);
                 }
             }
             else if (e.Pointer.PointerId == _touchId)
@@ -242,9 +260,14 @@ namespace Notes
         }
         #endregion DrawPad Actions
 
-        private void RenderStroke(InkStroke stroke, Brush brush, double width, double opacity = 1)
+        private void RenderStrokeOnNotePad(InkStroke stroke, Brush brush, double width, double scale)
         {
-            Path path = GetPathFromStrokes(stroke, brush, width, opacity);
+            Path path = GetPathFromStrokes(stroke, brush, width, 0.1);
+        }
+
+        private void RenderStrokeOnDrawPad(InkStroke stroke, Brush brush, double width, double opacity = 1)
+        {
+            Path path = GetPathFromStrokes(stroke, brush, width);
             DrawPad.Children.Add(path);
         }
     }
