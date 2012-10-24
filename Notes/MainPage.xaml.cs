@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Windows.Graphics.Display;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
+using System.Text;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -47,6 +48,14 @@ namespace Notes
             this.DrawPad.PointerEntered += DrawPad_PointerEntered;
             this.ClearButton.Click += ClearButton_Click;
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
+            InkDrawingAttributes inkAttributes = new InkDrawingAttributes
+            {
+                 Color = (LineStroke as SolidColorBrush).Color,
+                 Size = new Size(4, 4),
+                 PenTip = PenTipShape.Circle,
+                 FitToCurve = true
+            };
+            _inkManager.SetDefaultDrawingAttributes(inkAttributes);
         }
 
         public Double LineThickness
@@ -90,11 +99,26 @@ namespace Notes
             img.SetSource(mem);
             Rectangle rect = new Rectangle
             {
-                Width = 40,
-                Height = 40,
+                Width = 100,
+                Height = 100,
                 Fill = new ImageBrush { ImageSource = img }
             };
             NotePad.Children.Add(rect);
+            StringBuilder builder = new StringBuilder();
+            foreach (var recognizer in _inkManager.GetRecognizers())
+            {
+                if (recognizer.Name.Contains("中"))
+                {
+                    _inkManager.SetDefaultRecognizer(recognizer);
+                    var results = await _inkManager.RecognizeAsync(InkRecognitionTarget.All);
+                    foreach (var result in results)
+                    {
+                        var text = String.Join(", ", result.GetTextCandidates());
+                        builder.Append(text).Append("\r\n");
+                    }
+                    new MessageDialog(builder.ToString()).ShowAsync();
+                }
+            }
         }
 
         private Brush LineStroke
