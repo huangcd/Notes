@@ -50,10 +50,10 @@ namespace Notes
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
             InkDrawingAttributes inkAttributes = new InkDrawingAttributes
             {
-                 Color = (LineStroke as SolidColorBrush).Color,
-                 Size = new Size(4, 4),
-                 PenTip = PenTipShape.Circle,
-                 FitToCurve = true
+                Color = (LineStroke as SolidColorBrush).Color,
+                Size = new Size(8, 8),
+                PenTip = PenTipShape.Circle,
+                FitToCurve = true
             };
             _inkManager.SetDefaultDrawingAttributes(inkAttributes);
         }
@@ -88,37 +88,39 @@ namespace Notes
 
         private async void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (_inkManager.GetStrokes().Count == 0)
-            {
-                return;
-            }
-            mem = new InMemoryRandomAccessStream();
-            await _inkManager.SaveAsync(mem);
-            mem.Seek(0);
-            BitmapImage img = new BitmapImage();
-            img.SetSource(mem);
-            Rectangle rect = new Rectangle
-            {
-                Width = 100,
-                Height = 100,
-                Fill = new ImageBrush { ImageSource = img }
-            };
-            NotePad.Children.Add(rect);
-            StringBuilder builder = new StringBuilder();
-            foreach (var recognizer in _inkManager.GetRecognizers())
-            {
-                if (recognizer.Name.Contains("中"))
-                {
-                    _inkManager.SetDefaultRecognizer(recognizer);
-                    var results = await _inkManager.RecognizeAsync(InkRecognitionTarget.All);
-                    foreach (var result in results)
-                    {
-                        var text = String.Join(", ", result.GetTextCandidates());
-                        builder.Append(text).Append("\r\n");
-                    }
-                    new MessageDialog(builder.ToString()).ShowAsync();
-                }
-            }
+            await NotePad.AddCharacterAsync(_inkManager); 
+            ClearButton_Click(sender, null);
+            //if (_inkManager.GetStrokes().Count == 0)
+            //{
+            //    return;
+            //}
+            //mem = new InMemoryRandomAccessStream();
+            //await _inkManager.SaveAsync(mem);
+            //mem.Seek(0);
+            //BitmapImage img = new BitmapImage();
+            //img.SetSource(mem);
+            //Rectangle rect = new Rectangle
+            //{
+            //    Width = 100,
+            //    Height = 100,
+            //    Fill = new ImageBrush { ImageSource = img }
+            //};
+            //NotePad.Children.Add(rect);
+            //StringBuilder builder = new StringBuilder();
+            //foreach (var recognizer in _inkManager.GetRecognizers())
+            //{
+            //    if (recognizer.Name.Contains("中"))
+            //    {
+            //        _inkManager.SetDefaultRecognizer(recognizer);
+            //        var results = await _inkManager.RecognizeAsync(InkRecognitionTarget.All);
+            //        foreach (var result in results)
+            //        {
+            //            var text = String.Join(", ", result.GetTextCandidates());
+            //            builder.Append(text).Append("\r\n");
+            //        }
+            //        await new MessageDialog(builder.ToString()).ShowAsync();
+            //    }
+            //}
         }
 
         private Brush LineStroke
