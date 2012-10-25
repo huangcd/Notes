@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.UI.Input.Inking;
-using Windows.UI.Xaml.Shapes;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Popups;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Shapes;
+using System.Collections;
 
 namespace Notes.Common
 {
-    public class Note
+    public class Note : IEnumerable<Note.InkData>
     {
         private List<InkData> characters = new List<InkData>();
 
@@ -34,6 +32,14 @@ namespace Notes.Common
             }
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            foreach (var ink in characters)
+            {
+                yield return ink;
+            }
+        }
+
         public async Task<bool> AddCharacterAsync(InkManager manager)
         {
             if (manager.GetStrokes().Count == 0)
@@ -44,19 +50,38 @@ namespace Notes.Common
             {
                 InMemoryRandomAccessStream mem = new InMemoryRandomAccessStream();
                 await manager.SaveAsync(mem);
+                InkData data = new InkData();
                 mem.Seek(0);
-                byte[] bytes = new byte[mem.Size];
-                var dataReader = new DataReader(mem.GetInputStreamAt(0));
-                var operation = await dataReader.LoadAsync((uint)mem.Size);
-                dataReader.ReadBytes(bytes);
-                InkData data = new InkData { Data = bytes };
+                await data.LoadAsync(mem);
                 characters.Add(data);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                new MessageDialog(e.Message).ShowAsync();
                 return false;
+            }
+        }
+
+        public void Clear()
+        {
+            characters.Clear();
+        }
+
+        public IEnumerator<Note.InkData> GetEnumerator()
+        {
+            foreach (var ink in characters)
+            {
+                yield return ink;
+            }
+        }
+
+        public async Task LoadAsync(IRandomAccessStream reader)
+        {
+            while (reader.Position != reader.Size)
+            {
+                InkData data = new InkData();
+                await data.LoadAsync(reader);
+                characters.Add(data);
             }
         }
 
@@ -74,20 +99,18 @@ namespace Notes.Common
             }
         }
 
+        public async Task SaveAync(IOutputStream writer)
+        {
+            foreach (var ink in characters)
+            {
+                await ink.SaveAsync(writer);
+            }
+        }
         public class InkData
         {
             private InMemoryRandomAccessStream mem;
 
             public byte[] Data { get; set; }
-
-            public async Task<IRandomAccessStream> AsStreamAsync()
-            {
-                mem = null;
-                mem = new InMemoryRandomAccessStream();
-                await mem.WriteAsync(Data.AsBuffer());
-                mem.Seek(0);
-                return mem;
-            }
 
             public async Task<Rectangle> AsRectangleAsync(double width, double height)
             {
@@ -101,6 +124,28 @@ namespace Notes.Common
                     Fill = new ImageBrush { ImageSource = img }
                 };
                 return rect;
+            }
+
+            public async Task<IRandomAccessStream> AsStreamAsync()
+            {
+                mem = null;
+                mem = new InMemoryRandomAccessStream();
+                await mem.WriteAsync(Data.AsBuffer());
+                mem.Seek(0);
+                return mem;
+            }
+            public async Task LoadAsync(IRandomAccessStream reader)
+            {
+                byte[] bytes = new byte[reader.Size];
+                var dataReader = new DataReader(reader);
+                await dataReader.LoadAsync((uint)reader.Size);
+                dataReader.ReadBytes(bytes);
+                Data = bytes;
+            }
+
+            public async Task SaveAsync(IOutputStream writer)
+            {
+                await writer.WriteAsync(Data.AsBuffer());
             }
         }
     }

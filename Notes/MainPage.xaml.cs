@@ -38,6 +38,8 @@ namespace Notes
         private uint _penId;
         private Point _previousPoint;
         private uint _touchId;
+        private bool _inComfirmRegion = false;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -47,6 +49,7 @@ namespace Notes
             this.DrawPad.PointerExited += DrawPad_PointerExited;
             this.DrawPad.PointerEntered += DrawPad_PointerEntered;
             this.ClearButton.Click += ClearButton_Click;
+
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
             InkDrawingAttributes inkAttributes = new InkDrawingAttributes
             {
@@ -77,6 +80,8 @@ namespace Notes
                         Fill = new SolidColorBrush(Colors.YellowGreen),
                     };
                     _confirmRegion.PointerPressed += ConfirmRegion_PointerPressed;
+                    _confirmRegion.PointerEntered += _confirmRegion_PointerEntered;
+                    _confirmRegion.PointerExited += _confirmRegion_PointerExited;
                 }
                 Size size = DrawPad.RenderSize;
                 _confirmRegion.Margin = new Thickness(size.Width - _confirmRegion.Width, size.Height - _confirmRegion.Height, 0, 0);
@@ -84,44 +89,23 @@ namespace Notes
             }
         }
 
-        private InMemoryRandomAccessStream mem;
+        #region confirmRegion actions
+        void _confirmRegion_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            _inComfirmRegion = false;
+        }
+
+        void _confirmRegion_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            _inComfirmRegion = true;
+        }
 
         private async void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            await NotePad.AddCharacterAsync(_inkManager); 
+            await NotePad.AddCharacterAsync(_inkManager);
             ClearButton_Click(sender, null);
-            //if (_inkManager.GetStrokes().Count == 0)
-            //{
-            //    return;
-            //}
-            //mem = new InMemoryRandomAccessStream();
-            //await _inkManager.SaveAsync(mem);
-            //mem.Seek(0);
-            //BitmapImage img = new BitmapImage();
-            //img.SetSource(mem);
-            //Rectangle rect = new Rectangle
-            //{
-            //    Width = 100,
-            //    Height = 100,
-            //    Fill = new ImageBrush { ImageSource = img }
-            //};
-            //NotePad.Children.Add(rect);
-            //StringBuilder builder = new StringBuilder();
-            //foreach (var recognizer in _inkManager.GetRecognizers())
-            //{
-            //    if (recognizer.Name.Contains("中"))
-            //    {
-            //        _inkManager.SetDefaultRecognizer(recognizer);
-            //        var results = await _inkManager.RecognizeAsync(InkRecognitionTarget.All);
-            //        foreach (var result in results)
-            //        {
-            //            var text = String.Join(", ", result.GetTextCandidates());
-            //            builder.Append(text).Append("\r\n");
-            //        }
-            //        await new MessageDialog(builder.ToString()).ShowAsync();
-            //    }
-            //}
         }
+        #endregion
 
         private Brush LineStroke
         {
@@ -242,6 +226,11 @@ namespace Notes
 
         private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (_inComfirmRegion)
+            {
+                return;
+            }
+
             PointerPoint pt = e.GetCurrentPoint(DrawPad);
             _previousPoint = pt.Position;
 
