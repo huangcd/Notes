@@ -8,6 +8,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Shapes;
 using System.Collections;
+using Windows.Foundation;
 
 namespace Notes.Common
 {
@@ -106,6 +107,7 @@ namespace Notes.Common
                 await ink.SaveAsync(writer);
             }
         }
+
         public class InkData
         {
             private InMemoryRandomAccessStream mem;
@@ -116,7 +118,8 @@ namespace Notes.Common
             {
                 var stream = await AsStreamAsync();
                 BitmapImage img = new BitmapImage();
-                img.SetSource(mem);
+                IAsyncAction result = img.SetSourceAsync(mem);
+                await result;
                 Rectangle rect = new Rectangle
                 {
                     Width = width,
@@ -134,6 +137,7 @@ namespace Notes.Common
                 mem.Seek(0);
                 return mem;
             }
+
             public async Task LoadAsync(IRandomAccessStream reader)
             {
                 byte[] bytes = new byte[reader.Size];

@@ -30,13 +30,13 @@
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="NotePad"
+                            Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0">
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="NotePad"
+                            Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Row)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1">
                             </DiscreteObjectKeyFrame>
@@ -58,13 +58,13 @@
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="NotePad"
+                            Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0">
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="NotePad"
+                            Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Row)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1">
                             </DiscreteObjectKeyFrame>
@@ -88,8 +88,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Canvas Grid.Column="0" x:Name="DrawPad" Margin="20, 20, 20, 20" Background="#FF73C355"/>
-            <local:NotesCanvas Grid.Column="1" x:Name="NotePad" Margin="20, 20, 20, 20" RowCount="6" ColumnCount="6"/>
+            <Canvas Grid.Column="1" x:Name="DrawPad" Margin="20, 20, 20, 20" Background="#FF73C355"/>
+            <local:NotesCanvas Grid.Column="0" x:Name="NotePad" Margin="20, 20, 20, 20" RowCount="6" ColumnCount="6" Background="White"/>
         </Grid>
 
         <Grid Grid.Row="0" Margin="20, 0">

@@ -61,14 +61,35 @@ namespace Notes
             var canvasWidth = RenderSize.Width;
             var canvasHeight = RenderSize.Height;
             var gridWidth = canvasWidth / ColumnCount;
-            var gridHeight = canvasHeight /RowCount;
+            var gridHeight = canvasHeight / RowCount;
             Rectangle rect = await noteContent[index].AsRectangleAsync(gridWidth, gridHeight);
             rect.Margin = new Thickness(5 + (index % ColumnCount) * gridWidth, 5 + (index / ColumnCount) * gridHeight, 0, 0);
             Children.Add(rect);
         }
 
-        public void RemoveCharacter()
+        public Note.InkData RemoveLastCharacter()
         {
+            Children.RemoveAt(Children.Count - 1);
+            return noteContent.RemoveLastCharacter();
+        }
+
+        public int CharacterCount
+        {
+            get { return noteContent.Count; }
+        }
+
+        public async Task RePaintAll()
+        {
+            Children.Clear();
+            List<Task> tasks = new List<Task>();
+            for (int i = 0; i < CharacterCount; i++)
+            {
+                tasks.Add(RenderCharacter(i));
+            }
+            foreach (var task in tasks)
+            {
+                await task;
+            }
         }
     }
 }
