@@ -53,7 +53,7 @@ namespace Notes.Common
                 await manager.SaveAsync(mem);
                 InkData data = new InkData();
                 mem.Seek(0);
-                await data.LoadAsync(mem);
+                await data.LoadStrokeAsync(mem);
                 characters.Add(data);
                 return true;
             }
@@ -81,7 +81,7 @@ namespace Notes.Common
             while (reader.Position != reader.Size)
             {
                 InkData data = new InkData();
-                await data.LoadAsync(reader);
+                await data.LoadStrokeAsync(reader);
                 characters.Add(data);
             }
         }
@@ -114,7 +114,7 @@ namespace Notes.Common
 
             public byte[] Data { get; set; }
 
-            public async Task<Rectangle> AsRectangleAsync(double width, double height)
+            public async Task<Rectangle> AsFrameworkElementAsync(double width, double height)
             {
                 var stream = await AsStreamAsync();
                 BitmapImage img = new BitmapImage();
@@ -138,7 +138,7 @@ namespace Notes.Common
                 return mem;
             }
 
-            public async Task LoadAsync(IRandomAccessStream reader)
+            public async Task LoadStrokeAsync(IRandomAccessStream reader)
             {
                 byte[] bytes = new byte[reader.Size];
                 var dataReader = new DataReader(reader);

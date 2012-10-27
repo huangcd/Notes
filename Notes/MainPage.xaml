@@ -89,7 +89,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Canvas Grid.Column="1" x:Name="DrawPad" Margin="20, 20, 20, 20" Background="#FF73C355"/>
-            <local:NotesCanvas Grid.Column="0" x:Name="NotePad" Margin="20, 20, 20, 20" RowCount="6" ColumnCount="6" Background="White"/>
+            <local:NotesCanvas Grid.Column="0" x:Name="NotePad" Margin="20, 20, 20, 20" CharacterHeight="40" CharacterWidth="40" Background="White"/>
         </Grid>
 
         <Grid Grid.Row="0" Margin="20, 0">

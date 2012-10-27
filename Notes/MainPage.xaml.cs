@@ -81,8 +81,10 @@ namespace Notes
                         Height = 60,
                         Fill = new SolidColorBrush(Colors.Gray)
                     };
-
                 }
+                Size size = DrawPad.RenderSize;
+                clearRegion.Margin = new Thickness(0, size.Height - clearRegion.Height, 0, 0);
+                return clearRegion;
             }
         }
 
@@ -158,10 +160,10 @@ namespace Notes
             inkManager.SetDefaultDrawingAttributes(inkAttributes);
         }
 
-        private async void DisplayProperties_OrientationChanged(object sender)
+        private void DisplayProperties_OrientationChanged(object sender)
         {
             ClearButton_Click(sender, new RoutedEventArgs());
-            await NotePad.RePaintAll();
+            NotePad.RePaintAll();
         }
 
         private void HandleEvents()

@@ -15,31 +15,31 @@ namespace Notes
 {
     public sealed partial class NotesCanvas : Canvas
     {
-        readonly DependencyProperty RowCountProperty =
-            DependencyProperty.Register("RowCount", typeof(int), typeof(NotesCanvas), new PropertyMetadata(6));
-        readonly DependencyProperty ColumnCountProperty =
-             DependencyProperty.Register("ColumnCount", typeof(int), typeof(NotesCanvas), new PropertyMetadata(6));
+        readonly DependencyProperty CharacterHeightProperty =
+            DependencyProperty.Register("CharacterHeight", typeof(int), typeof(NotesCanvas), new PropertyMetadata(6));
+        readonly DependencyProperty CharacterWidthProperty =
+             DependencyProperty.Register("CharacterWidth", typeof(int), typeof(NotesCanvas), new PropertyMetadata(6));
 
-        public int RowCount
+        public int CharacterHeight
         {
             get
             {
-                return (int)GetValue(RowCountProperty);
+                return (int)GetValue(CharacterHeightProperty);
             }
             set
             {
-                SetValue(RowCountProperty, value);
+                SetValue(CharacterHeightProperty, value);
             }
         }
-        public int ColumnCount
+        public int CharacterWidth
         {
             get
             {
-                return (int)GetValue(ColumnCountProperty);
+                return (int)GetValue(CharacterWidthProperty);
             }
             set
             {
-                SetValue(ColumnCountProperty, value);
+                SetValue(CharacterWidthProperty, value);
             }
         }
 
@@ -58,13 +58,9 @@ namespace Notes
 
         private async Task RenderCharacter(int index)
         {
-            var canvasWidth = RenderSize.Width;
-            var canvasHeight = RenderSize.Height;
-            var gridWidth = canvasWidth / ColumnCount;
-            var gridHeight = canvasHeight / RowCount;
-            Rectangle rect = await noteContent[index].AsRectangleAsync(gridWidth, gridHeight);
-            rect.Margin = new Thickness(5 + (index % ColumnCount) * gridWidth, 5 + (index / ColumnCount) * gridHeight, 0, 0);
-            Children.Add(rect);
+            FrameworkElement elem = await noteContent[index].AsFrameworkElementAsync(CharacterWidth, CharacterHeight);
+            elem.Margin = new Thickness(5 + (index % CharacterWidth) * CharacterWidth, 5 + (index / CharacterWidth) * CharacterHeight, 0, 0);
+            Children.Add(elem);
         }
 
         public Note.InkData RemoveLastCharacter()
@@ -78,18 +74,15 @@ namespace Notes
             get { return noteContent.Count; }
         }
 
-        public async Task RePaintAll()
+        public void RePaintAll()
         {
             Children.Clear();
-            List<Task> tasks = new List<Task>();
+            Task[] tasks = new Task[CharacterCount];
             for (int i = 0; i < CharacterCount; i++)
             {
-                tasks.Add(RenderCharacter(i));
+                tasks[i] = RenderCharacter(i);
             }
-            foreach (var task in tasks)
-            {
-                await task;
-            }
+            Task.WaitAll(tasks);
         }
     }
 }
