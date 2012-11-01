@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Notes.Common;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
@@ -25,11 +31,11 @@ namespace Notes
         private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
         private Brush _lineStroke = new SolidColorBrush(Colors.Green);
         private double _lineThickness = 8.0;
-        private Rectangle confirmRegion;
-        private Rectangle clearRegion;
+        private Button clearButton;
+        private Button confirmButton;
         private Point currentPoint;
-        private bool inComfirmRegion = false;
-        private InkManager inkManager = new InkManager();
+        private bool inSpecialRegion = false;
+        private ScriptManager scripts = new ScriptManager();
         private uint penId;
         private Point previousPoint;
         private uint touchId;
@@ -39,6 +45,9 @@ namespace Notes
             this.InitializeComponent();
             HandleEvents();
             ConfigInkAttributes();
+            ResourceDictionary standard = new ResourceDictionary();
+            standard.Source = new Uri("ms-appx:///Common/StandardStyles.xaml", UriKind.Absolute);
+            Resources.MergedDictionaries.Add(standard);
         }
 
         public Double LineThickness
@@ -47,44 +56,47 @@ namespace Notes
             set { _lineThickness = value; }
         }
 
-        private Rectangle ConfirmRegion
+        private Button ConfirmButton
         {
             get
             {
-                if (confirmRegion == null)
+                if (confirmButton == null)
                 {
-                    confirmRegion = new Rectangle
+                    confirmButton = new Button
                     {
-                        Width = 60,
-                        Height = 60,
-                        Fill = new SolidColorBrush(Colors.YellowGreen),
+                        Style = (Style)Resources["ConfirmCharButtonStyle"],
+                        Width = 100,
+                        Height = 80,
                     };
-                    confirmRegion.PointerPressed += ConfirmRegion_PointerPressed;
-                    confirmRegion.PointerEntered += _confirmRegion_PointerEntered;
-                    confirmRegion.PointerExited += _confirmRegion_PointerExited;
+                    confirmButton.Click += ConfirmButton_Click;
+                    confirmButton.PointerEntered += ConfirmButton_PointerEntered;
+                    confirmButton.PointerExited += ConfirmButton_PointerExited;
                 }
                 Size size = DrawPad.RenderSize;
-                confirmRegion.Margin = new Thickness(size.Width - confirmRegion.Width, size.Height - confirmRegion.Height, 0, 0);
-                return confirmRegion;
+                confirmButton.Margin = new Thickness(size.Width - confirmButton.Width, size.Height - confirmButton.Height, 0, 0);
+                return confirmButton;
             }
         }
 
-        private Rectangle ClearRegion
+        private Button ClearButton
         {
             get
             {
-                if (clearRegion == null)
+                if (clearButton == null)
                 {
-                    clearRegion = new Rectangle
+                    clearButton = new Button
                     {
-                        Width = 60,
-                        Height = 60,
-                        Fill = new SolidColorBrush(Colors.Gray)
+                        Style = (Style)Resources["ClearCharButtonStyle"],
+                        Width = 100,
+                        Height = 80,
                     };
+                    clearButton.Click += ClearButton_Click;
+                    clearButton.PointerExited += ClearButton_PointerExited;
+                    clearButton.PointerEntered += ClearButton_PointerEntered;
                 }
                 Size size = DrawPad.RenderSize;
-                clearRegion.Margin = new Thickness(0, size.Height - clearRegion.Height, 0, 0);
-                return clearRegion;
+                clearButton.Margin = new Thickness(0, size.Height - clearButton.Height, 0, 0);
+                return clearButton;
             }
         }
 
@@ -127,7 +139,7 @@ namespace Notes
             return _strokeMaps[stroke];
         }
 
-        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             ClearDrawPad();
             ClearInkStrokes();
@@ -136,34 +148,18 @@ namespace Notes
         private void ClearDrawPad()
         {
             DrawPad.Children.Clear();
-            DrawPad.Children.Add(ConfirmRegion);
+            DrawPad.Children.Add(ConfirmButton);
+            DrawPad.Children.Add(ClearButton);
         }
 
         private void ClearInkStrokes()
         {
-            foreach (var stroke in inkManager.GetStrokes())
-            {
-                stroke.Selected = true;
-            }
-            inkManager.DeleteSelected();
+            scripts.ClearInkStrokes();
         }
 
         private void ConfigInkAttributes()
         {
-            InkDrawingAttributes inkAttributes = new InkDrawingAttributes
-            {
-                Color = (LineStroke as SolidColorBrush).Color,
-                Size = new Size(8, 8),
-                PenTip = PenTipShape.Circle,
-                FitToCurve = true
-            };
-            inkManager.SetDefaultDrawingAttributes(inkAttributes);
-        }
-
-        private void DisplayProperties_OrientationChanged(object sender)
-        {
-            ClearButton_Click(sender, new RoutedEventArgs());
-            NotePad.RePaintAll();
+            scripts.ConfigInkDrawingAttributes((LineStroke as SolidColorBrush).Color, new Size(8, 8));
         }
 
         private void HandleEvents()
@@ -173,23 +169,44 @@ namespace Notes
             DrawPad.PointerReleased += DrawPad_PointerReleased;
             DrawPad.PointerExited += DrawPad_PointerExited;
             DrawPad.PointerEntered += DrawPad_PointerEntered;
-            ClearButton.Click += ClearButton_Click;
-            DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
+            DeleteButton.Click += DeleteButton_Click;
         }
         #region confirmRegion actions
 
-        private void _confirmRegion_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void ConfirmButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            inComfirmRegion = true;
+            inSpecialRegion = true;
         }
 
-        private void _confirmRegion_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void ConfirmButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            inComfirmRegion = false;
+            inSpecialRegion = false;
         }
-        private async void ConfirmRegion_PointerPressed(object sender, PointerRoutedEventArgs e)
+
+        void ClearButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            await NotePad.AddCharacterAsync(inkManager);
+            inSpecialRegion = true;
+        }
+
+        void ClearButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            inSpecialRegion = false;
+        }
+
+        void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClearDrawPad();
+            ClearInkStrokes();
+        }
+
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        {
+            List<Path> paths = scripts.ConfirmCharacter
+                (NotePad.CharacterSize, NotePad.RenderSize, DrawPad.RenderSize);
+            foreach (var path in paths)
+            {
+                NotePad.Children.Add(path);
+            }
             ClearButton_Click(sender, null);
         }
 
@@ -204,9 +221,13 @@ namespace Notes
 
         private void DrawPad_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (!DrawPad.Children.Contains(ConfirmRegion))
+            if (!DrawPad.Children.Contains(ConfirmButton))
             {
-                DrawPad.Children.Add(ConfirmRegion);
+                DrawPad.Children.Add(ConfirmButton);
+            }
+            if (!DrawPad.Children.Contains(ClearButton))
+            {
+                DrawPad.Children.Add(ClearButton);
             }
         }
 
@@ -237,7 +258,7 @@ namespace Notes
                     previousPoint = currentPoint;
                     DrawPad.Children.Add(line);
 
-                    inkManager.ProcessPointerUpdate(pt);
+                    scripts.ProcessPointerUpdate(pt);
                 }
             }
             else if (e.Pointer.PointerId == touchId)
@@ -248,7 +269,7 @@ namespace Notes
 
         private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (inComfirmRegion)
+            if (inSpecialRegion)
             {
                 return;
             }
@@ -260,7 +281,7 @@ namespace Notes
             if (deviceType == PointerDeviceType.Pen ||
                 (deviceType == PointerDeviceType.Mouse && pt.Properties.IsLeftButtonPressed))
             {
-                inkManager.ProcessPointerDown(pt);
+                scripts.ProcessPointerDown(pt);
                 penId = pt.PointerId;
 
                 e.Handled = true;
@@ -280,9 +301,9 @@ namespace Notes
             if (e.Pointer.PointerId == penId)
             {
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
-                inkManager.ProcessPointerUp(pt);
+                scripts.ProcessPointerUp(pt);
                 ClearDrawPad();
-                foreach (InkStroke stroke in inkManager.GetStrokes())
+                foreach (InkStroke stroke in scripts.GetStrokes())
                 {
                     RenderStrokeOnDrawPad(stroke, LineStroke, LineThickness);
                 }
@@ -304,9 +325,24 @@ namespace Notes
             DrawPad.Children.Add(path);
         }
 
-        private void RenderStrokeOnNotePad(InkStroke stroke, Brush brush, double width, double scale)
+        private async void RePaint(object sender)
         {
-            Path path = GetPathFromStrokes(stroke, brush, width, 0.1);
+            ClearButton_Click(sender, null);
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    scripts.RepaintAll(NotePad.RenderSize, NotePad.CharacterSize);
+                });
+        }
+
+        private void Storyboard_Completed_Portrait(object sender, object e)
+        {
+            RePaint(sender);
+        }
+
+        private void Storyboard_Completed_Landscape(object sender, object e)
+        {
+            RePaint(sender);
         }
     }
 }
