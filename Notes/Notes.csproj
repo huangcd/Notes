@@ -109,17 +109,20 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Common\Char.cs" />
+    <Compile Include="Common\JsonExtensions.cs" />
     <Compile Include="Common\LayoutAwarePage.cs" />
     <Compile Include="Common\ScriptManager.cs" />
     <Compile Include="Common\Scripts.cs" />
+    <Compile Include="Common\Stroke.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ScriptCanvas.xaml.cs">
-      <DependentUpon>ScriptCanvas.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScrollScriptView.xaml.cs">
+      <DependentUpon>ScrollScriptView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -128,7 +131,9 @@
     <None Include="Common\Design.cd" />
     <None Include="Notes_StoreKey.pfx" />
     <None Include="Notes_TemporaryKey.pfx" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />
@@ -150,7 +155,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ScriptCanvas.xaml">
+    <Page Include="ScrollScriptView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

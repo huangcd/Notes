@@ -11,7 +11,7 @@ namespace Notes.Common
     {
         private Script _current;
         private InkManager _inkManager = new InkManager();
-        private List<Script> scripts = new List<Script>(); 
+        private List<Script> scripts = new List<Script>();
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
         public ScriptManager()
@@ -94,9 +94,19 @@ namespace Notes.Common
 
         public void CreateScript()
         {
+            if (_current != null)
+            {
+               _current.SaveAsync(ApplicationData.Current.LocalFolder);
+            }
             _current = new Script();
-            _current.DefaultCharColor = Colors.Black;
-            _current.DefaultThickness = 4.0;
+            _current.DefaultCharColor = new Color
+            {
+                R = 0,
+                G = 0,
+                B = 166,
+                A = 255,
+            };
+            _current.DefaultThickness = 8.0;
             scripts.Add(_current);
         }
 
@@ -133,7 +143,7 @@ namespace Notes.Common
         internal void RepaintAll(Size noteSize, Size charSize)
         {
             CurrentScript.RepaintAll(noteSize: noteSize, charSize: charSize);
-        } 
+        }
         #endregion
     }
 }

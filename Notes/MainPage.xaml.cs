@@ -9,6 +9,7 @@ using Notes.Common;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Graphics.Display;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
@@ -29,13 +30,13 @@ namespace Notes
     public sealed partial class MainPage : Notes.Common.LayoutAwarePage
     {
         private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
-        private Brush _lineStroke = new SolidColorBrush(Colors.Green);
+        private Brush _lineStroke = new SolidColorBrush(new Color { R = 0, G = 0, B = 0, A = 255 });
         private double _lineThickness = 8.0;
         private Button clearButton;
         private Button confirmButton;
         private Point currentPoint;
         private bool inSpecialRegion = false;
-        private ScriptManager scripts = new ScriptManager();
+        private ScriptManager scriptManager = new ScriptManager();
         private uint penId;
         private Point previousPoint;
         private uint touchId;
@@ -45,6 +46,11 @@ namespace Notes
             this.InitializeComponent();
             HandleEvents();
             ConfigInkAttributes();
+            HandleResource();
+        }
+
+        private void HandleResource()
+        {
             ResourceDictionary standard = new ResourceDictionary();
             standard.Source = new Uri("ms-appx:///Common/StandardStyles.xaml", UriKind.Absolute);
             Resources.MergedDictionaries.Add(standard);
@@ -139,7 +145,7 @@ namespace Notes
             return _strokeMaps[stroke];
         }
 
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             ClearDrawPad();
             ClearInkStrokes();
@@ -154,23 +160,61 @@ namespace Notes
 
         private void ClearInkStrokes()
         {
-            scripts.ClearInkStrokes();
+            scriptManager.ClearInkStrokes();
         }
 
         private void ConfigInkAttributes()
         {
-            scripts.ConfigInkDrawingAttributes((LineStroke as SolidColorBrush).Color, new Size(8, 8));
+            scriptManager.ConfigInkDrawingAttributes((LineStroke as SolidColorBrush).Color, new Size(8, 8));
         }
 
         private void HandleEvents()
         {
+            #region DrawPad
             DrawPad.PointerPressed += DrawPad_PointerPressed;
             DrawPad.PointerMoved += DrawPad_PointerMoved;
             DrawPad.PointerReleased += DrawPad_PointerReleased;
             DrawPad.PointerExited += DrawPad_PointerExited;
             DrawPad.PointerEntered += DrawPad_PointerEntered;
-            DeleteButton.Click += DeleteButton_Click;
+            #endregion
+
+            BackButton.Click += BackButton_Click;
+            AppBarSaveButton.Click += AppBarSaveButton_Click;
+            AppBarClearButton.Click += AppBarClearButton_Click;
+            AppBarDeleteButton.Click += AppBarDeleteButton_Click;
+            AppBarNewScriptButton.Click += AppBarNewScriptButton_Click;
         }
+
+        void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
+        {
+            scriptManager.CreateScript();
+        }
+
+        private async void AppBarDeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    scriptManager.CurrentScript.RemoveLast();
+                });
+        }
+
+        private async void AppBarClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    scriptManager.CurrentScript.Clear();
+                });
+        }
+
+        // Save Current Scripts
+        private void AppBarSaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            scriptManager.CurrentScript.SaveAsync(localFolder);
+        }
+
         #region confirmRegion actions
 
         private void ConfirmButton_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -201,11 +245,11 @@ namespace Notes
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            List<Path> paths = scripts.ConfirmCharacter
+            List<Path> paths = scriptManager.ConfirmCharacter
                 (NotePad.CharacterSize, NotePad.RenderSize, DrawPad.RenderSize);
             foreach (var path in paths)
             {
-                NotePad.Children.Add(path);
+                NotePad.AddChild(path);
             }
             ClearButton_Click(sender, null);
         }
@@ -258,12 +302,11 @@ namespace Notes
                     previousPoint = currentPoint;
                     DrawPad.Children.Add(line);
 
-                    scripts.ProcessPointerUpdate(pt);
+                    scriptManager.ProcessPointerUpdate(pt);
                 }
             }
             else if (e.Pointer.PointerId == touchId)
             {
-                // Touch
             }
         }
 
@@ -279,9 +322,10 @@ namespace Notes
 
             PointerDeviceType deviceType = e.Pointer.PointerDeviceType;
             if (deviceType == PointerDeviceType.Pen ||
-                (deviceType == PointerDeviceType.Mouse && pt.Properties.IsLeftButtonPressed))
+                (deviceType == PointerDeviceType.Mouse && pt.Properties.IsLeftButtonPressed) ||
+                deviceType == PointerDeviceType.Touch)
             {
-                scripts.ProcessPointerDown(pt);
+                scriptManager.ProcessPointerDown(pt);
                 penId = pt.PointerId;
 
                 e.Handled = true;
@@ -301,9 +345,9 @@ namespace Notes
             if (e.Pointer.PointerId == penId)
             {
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
-                scripts.ProcessPointerUp(pt);
+                scriptManager.ProcessPointerUp(pt);
                 ClearDrawPad();
-                foreach (InkStroke stroke in scripts.GetStrokes())
+                foreach (InkStroke stroke in scriptManager.GetStrokes())
                 {
                     RenderStrokeOnDrawPad(stroke, LineStroke, LineThickness);
                 }
@@ -327,11 +371,11 @@ namespace Notes
 
         private async void RePaint(object sender)
         {
-            ClearButton_Click(sender, null);
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                 () =>
                 {
-                    scripts.RepaintAll(NotePad.RenderSize, NotePad.CharacterSize);
+                    ClearButton_Click(sender, null);
+                    scriptManager.RepaintAll(NotePad.RenderSize, NotePad.CharacterSize);
                 });
         }
 

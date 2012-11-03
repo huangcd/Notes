@@ -1801,12 +1801,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ClearButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
-        <Setter Property="AutomationProperties.AutomationId" Value="ClearButtonId" />
-        <Setter Property="AutomationProperties.Name" Value="Clear" />
-        <Setter Property="Content" Value="&#xE1CD;" />
-    </Style>
-
     <Style x:Key="ClearCharButtonStyle" TargetType="Button" BasedOn="{StaticResource AppBarButtonStyle}">
         <Setter Property="Content" Value="&#xE10A;" />
     </Style>
