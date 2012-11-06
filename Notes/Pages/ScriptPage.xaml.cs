@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Notes.Common;
+using DrawToNote.Common;
+using DrawToNote.Datas;
 using Windows.Devices.Input;
 using Windows.Foundation;
-using Windows.Graphics.Display;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -22,12 +18,12 @@ using Windows.UI.Xaml.Shapes;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace Notes
+namespace DrawToNote.Pages
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Notes.Common.LayoutAwarePage
+    public sealed partial class ScriptPage : LayoutAwarePage
     {
         private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
         private Brush _lineStroke = new SolidColorBrush(new Color { R = 0, G = 0, B = 0, A = 255 });
@@ -36,12 +32,16 @@ namespace Notes
         private Button confirmButton;
         private Point currentPoint;
         private bool inSpecialRegion = false;
-        private ScriptManager scriptManager = new ScriptManager();
+        private ScriptManager scriptManager = ScriptManager.Instance;
         private uint penId;
         private Point previousPoint;
         private uint touchId;
 
-        public MainPage()
+        protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
+        {
+        }
+
+        public ScriptPage()
         {
             this.InitializeComponent();
             HandleEvents();
@@ -171,12 +171,14 @@ namespace Notes
         private void HandleEvents()
         {
             #region DrawPad
+
             DrawPad.PointerPressed += DrawPad_PointerPressed;
             DrawPad.PointerMoved += DrawPad_PointerMoved;
             DrawPad.PointerReleased += DrawPad_PointerReleased;
             DrawPad.PointerExited += DrawPad_PointerExited;
             DrawPad.PointerEntered += DrawPad_PointerEntered;
-            #endregion
+
+            #endregion DrawPad
 
             BackButton.Click += BackButton_Click;
             AppBarSaveButton.Click += AppBarSaveButton_Click;
@@ -185,7 +187,7 @@ namespace Notes
             AppBarNewScriptButton.Click += AppBarNewScriptButton_Click;
         }
 
-        void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
+        private void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
         {
             scriptManager.CreateScript();
         }
@@ -227,17 +229,17 @@ namespace Notes
             inSpecialRegion = false;
         }
 
-        void ClearButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void ClearButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             inSpecialRegion = true;
         }
 
-        void ClearButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void ClearButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             inSpecialRegion = false;
         }
 
-        void ClearButton_Click(object sender, RoutedEventArgs e)
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             ClearDrawPad();
             ClearInkStrokes();
@@ -255,6 +257,7 @@ namespace Notes
         }
 
         #endregion confirmRegion actions
+
         #region DrawPad Actions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

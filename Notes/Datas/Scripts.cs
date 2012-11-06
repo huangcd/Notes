@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
@@ -13,39 +14,42 @@ using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Media;
 
-namespace Notes.Common
+namespace DrawToNote.Datas
 {
-    public class Script : IEnumerable<Char>
+    public class Script
     {
+        private const String FileSufix = ".js";
         private const double ScaleConstance = 1.2;
-        internal List<Char> characters = new List<Char>();
+
+        [JsonProperty]
+        internal ObservableCollection<Char> characters = new ObservableCollection<Char>();
+
         private static UTF8Encoding encoding = new UTF8Encoding();
         public Script()
         {
             CreateDate = DateTime.Now;
+            Title = "New Script";
         }
 
         public int Count { get { return characters.Count; } }
 
+        [JsonProperty]
         public Color DefaultCharColor { get; set; }
 
+        [JsonProperty]
         public double DefaultThickness { get; set; }
+
+        [JsonProperty]
         internal DateTime CreateDate { get; set; }
 
-        internal String Title { get; set; }
+        [JsonProperty]
+        public String Title { get; set; }
 
         public Char this[int index]
         {
             get
             {
                 return characters[index];
-            }
-        }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            foreach (var chr in characters)
-            {
-                yield return chr;
             }
         }
 
@@ -109,12 +113,19 @@ namespace Notes.Common
             this.LoadFromJObject(obj);
         }
 
+        public void LoadAsync(IBuffer buffer)
+        {
+            byte[] bytes = buffer.ToArray();
+            String content = encoding.GetString(bytes, 0, bytes.Length);
+            JObject obj = (JObject)JsonConvert.DeserializeObject(content);
+            this.LoadFromJObject(obj);
+        }
+
         public async void SaveAsync(StorageFolder folder)
         {
-            String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + ".json";
-            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, this.ToJsonObject().ToString());
-            await new MessageDialog(file.Path).ShowAsync();
+            String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
+            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this));
         }
 
         public async void SaveAsync(IOutputStream output)

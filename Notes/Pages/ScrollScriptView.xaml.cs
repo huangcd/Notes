@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace Notes
+namespace DrawToNote.Pages
 {
     public sealed partial class ScrollScriptView : UserControl
     {

@@ -1,16 +1,17 @@
 ﻿<common:LayoutAwarePage
-    x:Class="Notes.MainPage"
+    x:Class="DrawToNote.Pages.ScriptPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Notes"
+    xmlns:local="using:DrawToNote"
+    xmlns:pages="using:DrawToNote.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:common="using:Notes.Common"
+    xmlns:common="using:DrawToNote.Common"
     x:Name="PageRoot"
     mc:Ignorable="d">
 
     <Grid
-          Style="{StaticResource LayoutRootStyle}" Background="#FFABD3E2">
+          Style="{StaticResource AppDefaultRootStyle}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ApplicationViewStates">
                 <VisualState x:Name="FullScreenLandscape">
@@ -60,7 +61,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Canvas Grid.Column="1" x:Name="DrawPad" Margin="20, 20, 20, 20" Background="#FF0071BC"/>
-            <local:ScrollScriptView Grid.Column="0" x:Name="NotePad" Margin="20, 20, 20, 20" CanvasBackground="White" CharacterWidth="40" CharacterHeight="40"/>
+            <pages:ScrollScriptView Grid.Column="0" x:Name="NotePad" Margin="20, 20, 20, 20" CanvasBackground="White" CharacterWidth="60" CharacterHeight="60"/>
         </Grid>
 
         <Grid Grid.Row="0" Margin="20, 0">
@@ -69,7 +70,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="BackButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=PageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock Grid.Column="1" Text="DRAW TO NOTE" Style="{StaticResource PageHeaderTextStyle}"  FontFamily="Segoe UI Semibold" FontWeight="Bold" Foreground="#FF0000A6"/>
+            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="DRAW TO NOTE" IsHitTestVisible="false" Style="{StaticResource AppDefaultHeaderTextStyle}"/>
         </Grid>
     </Grid>
     <Page.TopAppBar>

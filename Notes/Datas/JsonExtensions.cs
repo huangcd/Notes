@@ -1,10 +1,36 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
+using Newtonsoft.Json;
 
-namespace Notes.Common
+namespace DrawToNote.Datas
 {
+    public class PointConverter : CustomCreationConverter<Point>
+    {
+        public override Point Create(Type objectType)
+        {
+            return new Point();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                if (!(value is Point))
+                {
+                    throw new JsonSerializationException("Expected Point object value");
+                }
+                writer.WriteValue(((Point)value).ToJsonObject());
+            }
+        }
+    }
+
     internal static class JsonExtensions
     {
         public static JArray GetJArray(this JObject obj, string propertyName)

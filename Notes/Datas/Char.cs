@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Media;
 
-namespace Notes.Common
+namespace DrawToNote.Datas
 {
     public class Char
     {
         private static UTF8Encoding encoding = new UTF8Encoding();
-        private List<Stroke> strokes = new List<Stroke>();
+
+        [JsonProperty]
+        private ObservableCollection<Stroke> strokes = new ObservableCollection<Stroke>();
 
         public Char(InkManager manager, Size canvasSize)
         {
@@ -31,14 +35,19 @@ namespace Notes.Common
         {
         }
 
+        [JsonProperty]
         public Brush CharBrush { get; set; }
 
+        [JsonProperty]
         public double Thickness { get; set; }
+
+        [JsonProperty]
         internal Size CanvasSize { get; set; }
 
+        [JsonProperty]
         internal byte[] InkBytes { get; set; }
 
-        internal List<Stroke> Strokes
+        internal ObservableCollection<Stroke> Strokes
         {
             get
             {

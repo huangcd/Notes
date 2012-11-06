@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Windows.Foundation;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml;
@@ -7,7 +8,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 
-namespace Notes.Common
+namespace DrawToNote.Datas
 {
     internal class Stroke
     {
@@ -34,10 +35,13 @@ namespace Notes.Common
         {
         }
 
+        [JsonProperty]
         internal List<BezierSegment> BezierSegments { get { return segments; } }
 
+        [JsonProperty]
         internal Size CanvasSize { get; set; }
 
+        [JsonProperty]
         internal Point StartPoint { get; set; }
 
         public Path AsPath(Brush brush, double thickness, double shiftX, double shiftY, double scaleX, double scaleY, double opacity = 1)

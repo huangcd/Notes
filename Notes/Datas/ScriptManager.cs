@@ -1,22 +1,38 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
+using System;
+using Windows.Storage.Streams;
+using System.Linq;
+using Windows.UI.Popups;
 
-namespace Notes.Common
+namespace DrawToNote.Datas
 {
     public class ScriptManager : IEnumerable<Script>
     {
+        private static readonly ScriptManager instance = new ScriptManager();
         private Script _current;
         private InkManager _inkManager = new InkManager();
-        private List<Script> scripts = new List<Script>();
+        private ObservableCollection<Script> scripts = new ObservableCollection<Script>();
+        private ObservableCollection<Script> recentScripts = new ObservableCollection<Script>();
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
-        public ScriptManager()
+        private ScriptManager()
         {
             CreateScript();
+        }
+
+        public static ScriptManager Instance
+        {
+            get
+            {
+                return instance;
+            }
         }
 
         public Script CurrentScript
@@ -96,7 +112,7 @@ namespace Notes.Common
         {
             if (_current != null)
             {
-               _current.SaveAsync(ApplicationData.Current.LocalFolder);
+                _current.SaveAsync(ApplicationData.Current.LocalFolder);
             }
             _current = new Script();
             _current.DefaultCharColor = new Color
@@ -145,5 +161,23 @@ namespace Notes.Common
             CurrentScript.RepaintAll(noteSize: noteSize, charSize: charSize);
         }
         #endregion
+
+        public async Task<ObservableCollection<Script>> LoadScriptsAsync()
+        {
+            var files = await ApplicationData.Current.LocalFolder.GetFilesAsync();
+            foreach (var file in files)
+            {
+                await new MessageDialog(file.Path).ShowAsync();
+            }
+            var tasks = files.Select(file => Task.Run(
+                async () => {
+                    IBuffer buffer = await FileIO.ReadBufferAsync(file);
+                    Script script = new Script();
+                    script.LoadAsync(buffer);
+                    scripts.Add(script);
+                }));
+            var results = Task.WhenAll(tasks);
+            return scripts;
+        }
     }
 }
