@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using DrawToNote.Common;
 using DrawToNote.Datas;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -24,10 +17,16 @@ namespace DrawToNote.Pages
     /// </summary>
     public sealed partial class NotesPage : LayoutAwarePage
     {
-        ScriptManager scriptManager = ScriptManager.Instance;
+        private ScriptManager scriptManager = ScriptManager.Instance;
+
         public NotesPage()
         {
             this.InitializeComponent();
+            //this.Background = new ImageBrush
+            //{
+            //    ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/background.png")),
+            //    Stretch = Stretch.UniformToFill
+            //};
         }
 
         /// <summary>
@@ -39,20 +38,70 @@ namespace DrawToNote.Pages
         /// </param>
         /// <param name="pageState">A dictionary of state preserved by this page during an earlier
         /// session.  This will be null the first time a page is visited.</param>
-        protected async override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        protected override async void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
-            this.DefaultViewModel["Scripts"] = await scriptManager.LoadScriptsAsync();
-            // TODO: Assign a bindable collection of items to this.DefaultViewModel["Items"]
+            if (navigationParameter != null && navigationParameter is Script)
+            {
+                this.DefaultViewModel["ScriptGroup"] = new[]
+                {
+                    new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
+                    new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
+                };
+            }
+            else
+            {
+                // TODO: If there isn't a file in the localState, add a script to demostrate how to use directly.
+                this.DefaultViewModel["ScriptGroup"] = new[]
+                {
+                    new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
+                    new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
+                };
+
+                await scriptManager.LoadScriptsAsync();
+                if (scriptManager.CurrentScript == null)
+                {
+                    this.Frame.Navigate(typeof(ScriptPage));
+                }
+            }
         }
 
         private void ItemView_ItemClick(object sender, ItemClickEventArgs e)
         {
-
+            Script script = e.ClickedItem as Script;
+            this.Frame.Navigate(typeof(ScriptPage), script);
         }
 
         private void Header_Click(object sender, RoutedEventArgs e)
         {
+        }
 
+        private HashSet<Script> selectScripts = new HashSet<Script>();
+
+        private void itemGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (var item in e.RemovedItems)
+            {
+                selectScripts.Remove(item as Script);
+            }
+            foreach (var item in e.AddedItems)
+            {
+                selectScripts.Add(item as Script);
+            }
+        }
+
+        private void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
+        {
+            scriptManager.CreateScript();
+            Frame.Navigate(typeof(ScriptPage), scriptManager.CurrentScript);
+        }
+
+        private void AppBarDeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            List<Script> list = new List<Script>(selectScripts);
+            foreach (var item in list)
+            {
+                scriptManager.Remove(item);
+            }
         }
     }
 }

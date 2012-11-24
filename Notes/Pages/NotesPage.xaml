@@ -11,12 +11,12 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-
         <!-- Collection of items displayed by this page -->
         <CollectionViewSource
             x:Name="itemsViewSource"
-            Source="{Binding Scripts}"
+            Source="{Binding ScriptGroup}"
             IsSourceGrouped="True"
+            ItemsPath="Scripts"
             />
 
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
@@ -42,11 +42,12 @@
             Grid.RowSpan="2"
             Padding="116,137,40,46"
             ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
-            ItemTemplate="{StaticResource Standard250x250ItemTemplate}"
-            SelectionMode="None"
+            ItemTemplate="{StaticResource StandardScriptTemplate}"
             IsSwipeEnabled="false"
             IsItemClickEnabled="True"
-            ItemClick="ItemView_ItemClick">
+            ItemClick="ItemView_ItemClick"
+            SelectionMode="Multiple"
+            SelectionChanged="itemGridView_SelectionChanged">
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal"/>
@@ -90,9 +91,13 @@
             Margin="0,-10,0,0"
             Padding="10,0,0,60"
             ItemsSource="{Binding Source={StaticResource itemsViewSource}}"
-            ItemTemplate="{StaticResource Standard80ItemTemplate}"
-            SelectionMode="None"
-            IsSwipeEnabled="false"/>
+            ItemTemplate="{StaticResource StandardScriptTemplate}"
+            SelectionMode="Multiple"
+            IsItemClickEnabled="True"
+            SelectionChanged="itemGridView_SelectionChanged"
+            IsSwipeEnabled="false"
+            ItemClick="ItemView_ItemClick">
+        </ListView>
 
         <!-- Back button and page title -->
         <Grid>
@@ -100,8 +105,8 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="Scripts" IsHitTestVisible="false" Style="{StaticResource AppDefaultHeaderTextStyle}"/>
+            <Button x:Name="backButton" Click="GoBack" IsEnabled="false" Style="{StaticResource BackButtonStyle}"/>
+            <TextBlock x:Uid="Application" x:Name="pageTitle" Grid.Column="1" Text="Draw To Note" IsHitTestVisible="false" Style="{StaticResource AppDefaultHeaderTextStyle}"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
@@ -147,4 +152,20 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
     </Grid>
+    <Page.BottomAppBar>
+        <AppBar x:Name="PageBottomAppBar" Padding="10, 0, 10, 0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="LeftCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <Button x:Uid="DeleteScriptButton" x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
+                            Content="&#xE10A;" Click="AppBarDeleteButton_Click"/>
+                    <Button x:Uid="AddScriptButton" x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
+                             Content="&#x271A;" Click="AppBarNewScriptButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </AppBar>
+    </Page.BottomAppBar>
 </common:LayoutAwarePage>

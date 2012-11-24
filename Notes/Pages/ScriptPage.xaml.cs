@@ -6,8 +6,8 @@ using DrawToNote.Common;
 using DrawToNote.Datas;
 using Windows.Devices.Input;
 using Windows.Foundation;
-using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml;
@@ -15,6 +15,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
+using Callisto.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Popups;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -25,20 +28,39 @@ namespace DrawToNote.Pages
     /// </summary>
     public sealed partial class ScriptPage : LayoutAwarePage
     {
-        private static Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
+        private Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
         private Brush _lineStroke = new SolidColorBrush(new Color { R = 0, G = 0, B = 0, A = 255 });
         private double _lineThickness = 8.0;
         private Button clearButton;
         private Button confirmButton;
         private Point currentPoint;
-        private bool inSpecialRegion = false;
+        private bool _inSpecialRegion = false;
         private ScriptManager scriptManager = ScriptManager.Instance;
         private uint penId;
         private Point previousPoint;
         private uint touchId;
 
+        public bool InSpecialRegion
+        {
+            get
+            {
+                return _inSpecialRegion;
+            }
+        }
+
         protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
         {
+            if (navigationParameter == null)
+            {
+                scriptManager.CreateScript();
+            }
+            else
+            {
+                Script script = navigationParameter as Script;
+                scriptManager.CurrentScript = script;
+            }
+            this.DataContext = scriptManager.CurrentScript;
+            NotePad.Characters = scriptManager.CurrentScript.Characters;
         }
 
         public ScriptPage()
@@ -52,14 +74,36 @@ namespace DrawToNote.Pages
         private void HandleResource()
         {
             ResourceDictionary standard = new ResourceDictionary();
-            standard.Source = new Uri("ms-appx:///Common/StandardStyles.xaml", UriKind.Absolute);
+            standard.Source = new Uri("ms-appx:///Common/NoteResources.xaml", UriKind.Absolute);
             Resources.MergedDictionaries.Add(standard);
         }
 
         public Double LineThickness
         {
-            get { return _lineThickness; }
-            set { _lineThickness = value; }
+            get
+            {
+                return _lineThickness;
+            }
+            set
+            {
+                if (_lineThickness == value)
+                {
+                    return;
+                }
+                _lineThickness = value;
+                HandlerLineThicknessChanged();
+            }
+        }
+
+        public async void HandlerLineThicknessChanged()
+        {
+            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                foreach (var path in _strokeMaps.Values)
+                {
+                    path.StrokeThickness = LineThickness;
+                }
+            });
         }
 
         private Button ConfirmButton
@@ -79,7 +123,7 @@ namespace DrawToNote.Pages
                     confirmButton.PointerExited += ConfirmButton_PointerExited;
                 }
                 Size size = DrawPad.RenderSize;
-                confirmButton.Margin = new Thickness(size.Width - confirmButton.Width, size.Height - confirmButton.Height, 0, 0);
+                confirmButton.Margin = new Thickness(size.Width - confirmButton.Width - 5, size.Height - confirmButton.Height, 0, 0);
                 return confirmButton;
             }
         }
@@ -112,7 +156,7 @@ namespace DrawToNote.Pages
             set { _lineStroke = value; }
         }
 
-        private static Path GetPathFromStrokes(InkStroke stroke, Brush brush, double width, double scale = 1, double opacity = 1)
+        private Path GetPathFromStrokes(InkStroke stroke, double scale = 1, double opacity = 1)
         {
             if (!_strokeMaps.ContainsKey(stroke))
             {
@@ -137,14 +181,15 @@ namespace DrawToNote.Pages
                     });
                 }
 
-                path.StrokeThickness = width;
-                path.Stroke = brush;
+                path.StrokeThickness = LineThickness;
+                path.Stroke = LineStroke;
                 path.Opacity = opacity;
                 _strokeMaps[stroke] = path;
             }
             return _strokeMaps[stroke];
         }
 
+        // TODO should it be removed?
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             ClearDrawPad();
@@ -161,6 +206,8 @@ namespace DrawToNote.Pages
         private void ClearInkStrokes()
         {
             scriptManager.ClearInkStrokes();
+            // TODO test whether it's OK to clear
+            _strokeMaps.Clear();
         }
 
         private void ConfigInkAttributes()
@@ -181,10 +228,34 @@ namespace DrawToNote.Pages
             #endregion DrawPad
 
             BackButton.Click += BackButton_Click;
-            AppBarSaveButton.Click += AppBarSaveButton_Click;
+
+            //AppBarSaveButton.Click += AppBarSaveButton_Click;
             AppBarClearButton.Click += AppBarClearButton_Click;
             AppBarDeleteButton.Click += AppBarDeleteButton_Click;
-            AppBarNewScriptButton.Click += AppBarNewScriptButton_Click;
+            LineWidthButton.Click += LineWidthButton_Click;
+
+            //AppBarNewScriptButton.Click += AppBarNewScriptButton_Click;
+        }
+
+        void LineWidthButton_Click(object sender, RoutedEventArgs e)
+        {
+            Flyout f = new Flyout();
+
+            f.Placement = PlacementMode.Top;
+            f.PlacementTarget = sender as UIElement; // this is an UI element (usually the sender)
+
+            LineWidthSelector selector = new LineWidthSelector();
+            selector.Width = 400;
+            selector.Height = 100;
+
+            f.Content = selector;
+            selector.ValueChanged += (_sender, _e) =>
+            {
+                LineThickness = _e.NewValue;
+                NotePad.LineWidth = LineThickness;
+            };
+
+            f.IsOpen = true;
         }
 
         private void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
@@ -194,7 +265,7 @@ namespace DrawToNote.Pages
 
         private async void AppBarDeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
                 {
                     scriptManager.CurrentScript.RemoveLast();
@@ -203,7 +274,7 @@ namespace DrawToNote.Pages
 
         private async void AppBarClearButton_Click(object sender, RoutedEventArgs e)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
                 {
                     scriptManager.CurrentScript.Clear();
@@ -211,49 +282,49 @@ namespace DrawToNote.Pages
         }
 
         // Save Current Scripts
-        private void AppBarSaveButton_Click(object sender, RoutedEventArgs e)
+        private async void AppBarSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            scriptManager.CurrentScript.SaveAsync(localFolder);
+            await scriptManager.CurrentScript.SaveAsync();
         }
 
         #region confirmRegion actions
 
         private void ConfirmButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            inSpecialRegion = true;
+            _inSpecialRegion = true;
         }
 
         private void ConfirmButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            inSpecialRegion = false;
+            _inSpecialRegion = false;
         }
 
         private void ClearButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            inSpecialRegion = true;
+            _inSpecialRegion = true;
         }
 
         private void ClearButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            inSpecialRegion = false;
+            _inSpecialRegion = false;
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             ClearDrawPad();
             ClearInkStrokes();
+            _inSpecialRegion = false;
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            List<Path> paths = scriptManager.ConfirmCharacter
-                (NotePad.CharacterSize, NotePad.RenderSize, DrawPad.RenderSize);
-            foreach (var path in paths)
-            {
-                NotePad.AddChild(path);
-            }
+            scriptManager.ConfirmCharacter(
+                NotePad.CharacterSize,
+                NotePad.RenderSize,
+                DrawPad.RenderSize,
+                NotePad);
             ClearButton_Click(sender, null);
+            _inSpecialRegion = false;
         }
 
         #endregion confirmRegion actions
@@ -290,7 +361,7 @@ namespace DrawToNote.Pages
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
                 currentPoint = pt.Position;
 
-                if (checkDistance(currentPoint, previousPoint) > 2)
+                if (checkDistance(currentPoint, previousPoint) > 4)
                 {
                     Line line = new Line()
                     {
@@ -315,7 +386,7 @@ namespace DrawToNote.Pages
 
         private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (inSpecialRegion)
+            if (_inSpecialRegion)
             {
                 return;
             }
@@ -352,7 +423,7 @@ namespace DrawToNote.Pages
                 ClearDrawPad();
                 foreach (InkStroke stroke in scriptManager.GetStrokes())
                 {
-                    RenderStrokeOnDrawPad(stroke, LineStroke, LineThickness);
+                    RenderStrokeOnDrawPad(stroke);
                 }
             }
             else if (e.Pointer.PointerId == touchId)
@@ -366,22 +437,35 @@ namespace DrawToNote.Pages
 
         #endregion DrawPad Actions
 
-        private void RenderStrokeOnDrawPad(InkStroke stroke, Brush brush, double width, double opacity = 1)
+        private void RenderStrokeOnDrawPad(InkStroke stroke, double opacity = 1)
         {
-            Path path = GetPathFromStrokes(stroke, brush, width);
+            Path path = GetPathFromStrokes(stroke);
             DrawPad.Children.Add(path);
         }
 
-        private async void RePaint(object sender)
+        private void RePaint(object sender)
         {
-            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-                () =>
-                {
-                    ClearButton_Click(sender, null);
-                    scriptManager.RepaintAll(NotePad.RenderSize, NotePad.CharacterSize);
-                });
+            //await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            //    () =>
+            //    {
+            ClearButton_Click(sender, null);
+            NotePad.Repaint();
+            //});
         }
 
+        protected override void GoBack(object sender, RoutedEventArgs e)
+        {
+            NotePad.Clear();
+            scriptManager.CurrentScript.Save();
+            this.Frame.Navigate(typeof(NotesPage), scriptManager.CurrentScript);
+        }
+
+        private void ScriptTitle_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            scriptManager.CurrentScript.Title = (sender as TextBox).Text;
+        }
+
+        #region Storyboard
         private void Storyboard_Completed_Portrait(object sender, object e)
         {
             RePaint(sender);
@@ -391,5 +475,16 @@ namespace DrawToNote.Pages
         {
             RePaint(sender);
         }
+
+        private void Storyboard_Completed_Filled(object sender, object e)
+        {
+            RePaint(sender);
+        }
+
+        private void Storyboard_Completed_Snapped(object sender, object e)
+        {
+            RePaint(sender);
+        } 
+        #endregion
     }
 }

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
+using DrawToNote.Datas;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -18,16 +16,87 @@ namespace DrawToNote.Pages
 {
     public sealed partial class ScrollScriptView : UserControl
     {
-        readonly DependencyProperty CharacterHeightProperty =
-            DependencyProperty.Register("CharacterHeight", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(40));
-        readonly DependencyProperty CharacterWidthProperty =
-             DependencyProperty.Register("CharacterWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(40));
-        readonly DependencyProperty CanvasBackgroundProperty =
+        private const double ScaleConstance = 1.2;
+
+        #region Properties
+
+        private readonly DependencyProperty CharacterHeightProperty =
+            DependencyProperty.Register("CharacterHeight", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(20));
+
+        private readonly DependencyProperty CharacterWidthProperty =
+             DependencyProperty.Register("CharacterWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(20));
+
+        private readonly DependencyProperty CanvasBackgroundProperty =
              DependencyProperty.Register("CanvasBackground", typeof(Brush), typeof(ScrollScriptView), new PropertyMetadata(null));
 
-        public ScrollScriptView()
+        private readonly DependencyProperty CharactersProperty =
+            DependencyProperty.Register("Characters",
+            typeof(ObservableCollection<Char>),
+            typeof(ScrollScriptView),
+            new PropertyMetadata(new ObservableCollection<Char>(), OnCharactersChanged));
+
+        private readonly DependencyProperty SnapshotProperty =
+            DependencyProperty.Register("Snapshot",
+            typeof(bool),
+            typeof(ScrollScriptView),
+            new PropertyMetadata(false));
+
+        private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            this.InitializeComponent();
+            ScrollScriptView container = d as ScrollScriptView;
+            (e.OldValue as ObservableCollection<Char>).CollectionChanged -= container.BindingScript_ScriptChanged;
+            (e.NewValue as ObservableCollection<Char>).CollectionChanged += container.BindingScript_ScriptChanged;
+            if (container.Snapshot)
+            {
+                container.Repaint();
+            }
+        }
+
+        private readonly DependencyProperty ThicknessProperty =
+            DependencyProperty.Register("LineWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(8.0));
+
+        public bool Snapshot
+        {
+            get
+            {
+                return (bool)GetValue(SnapshotProperty);
+            }
+            set
+            {
+                SetValue(SnapshotProperty, value);
+            }
+        }
+
+        public double LineWidth
+        {
+            get
+            {
+                return (double)GetValue(ThicknessProperty);
+            }
+            set
+            {
+                if (value == (double)GetValue(ThicknessProperty))
+                {
+                    return;
+                }
+                SetValue(ThicknessProperty, value);
+                foreach (var path in _cached.Values)
+                {
+                    path.StrokeThickness = value;
+                }
+            }
+        }
+
+        public ObservableCollection<Char> Characters
+        {
+            get
+            {
+                return (ObservableCollection<Char>)GetValue(CharactersProperty);
+            }
+            set
+            {
+                SetValue(CharactersProperty, value);
+            }
         }
 
         public double CharacterHeight
@@ -46,7 +115,7 @@ namespace DrawToNote.Pages
         {
             get
             {
-                Size size = base.RenderSize;
+                Size size = Snapshot ? new Size(Width, Height) : base.RenderSize;
                 ScrollCanvas.Width = size.Width;
                 return size;
             }
@@ -84,9 +153,191 @@ namespace DrawToNote.Pages
             }
         }
 
-        public void AddChild(UIElement child)
+        #endregion Properties
+
+        public ScrollScriptView()
         {
-            ScrollCanvas.Children.Add(child);
+            this.InitializeComponent();
+            Characters.CollectionChanged += BindingScript_ScriptChanged;
+            SizeChanged += ScrollScriptView_SizeChanged;
+        }
+
+        private void ScrollScriptView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double x1 = 0;
+            double x2 = ActualWidth;
+            double y = CharacterHeight;
+            while (y < ActualHeight)
+            {
+                Line line = new Line
+                {
+                    X1 = x1,
+                    X2 = x2,
+                    Y1 = y,
+                    Y2 = y,
+                    StrokeThickness = 1,
+                    Stroke = new SolidColorBrush(Colors.LightGray)
+                };
+                ScrollCanvas.Children.Add(line);
+                y += CharacterHeight;
+            }
+        }
+
+        private void CalcScaleInformation(
+            Char chr,
+            Size charSize,
+            int index,
+            out double shiftX,
+            out double shiftY,
+            out double scaleX,
+            out double scaleY)
+        {
+            int columnCount = Snapshot ? (int)(RenderSize.Width / charSize.Width) : (int)((RenderSize.Width - 20) / charSize.Width);
+            int row = index / columnCount;
+            int column = index % columnCount;
+            shiftX = column * charSize.Width;
+            shiftY = row * charSize.Height;
+            scaleX = charSize.Width * ScaleConstance / chr.CanvasSize.Width;
+            scaleY = charSize.Height * ScaleConstance / chr.CanvasSize.Height;
+            if (!Snapshot && (double.IsNaN(Height) || shiftY + charSize.Height > Height))
+            {
+                Height = System.Math.Max(shiftY + charSize.Height + 10, RenderSize.Height);
+            }
+        }
+
+        private Dictionary<Stroke, Path> _cached = new Dictionary<Stroke, Path>();
+
+        private Path GetPath(Stroke stroke)
+        {
+            if (!_cached.ContainsKey(stroke))
+            {
+                Path path = stroke.CreatePath();
+                _cached[stroke] = path;
+            }
+            return _cached[stroke];
+        }
+
+        private Path ConvertStrokeToPath(
+            Stroke stroke,
+            double shiftX,
+            double shiftY,
+            double scaleX,
+            double scaleY,
+            double opacity = 1)
+        {
+            Path path = GetPath(stroke);
+            path.StrokeThickness = LineWidth;
+            path.Stroke = Foreground;
+            path.Opacity = opacity;
+            path.RenderTransform = new ScaleTransform
+            {
+                ScaleX = scaleX,
+                ScaleY = scaleY
+            };
+            path.Margin = new Thickness(shiftX, shiftY, 0, 0);
+            return path;
+        }
+
+        private void BindingScript_ScriptChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (RenderSize.Width == 0 && RenderSize.Height == 0)
+            {
+                Characters.CollectionChanged -= BindingScript_ScriptChanged;
+                return;
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    int index = e.NewStartingIndex;
+                    Char chr = Characters[index];
+                    RenderCharacter(index, chr);
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    var items = e.OldItems;
+                    foreach (var item in items)
+                    {
+                        foreach (var stroke in (item as Char).Strokes)
+                        {
+                            ScrollCanvas.Children.Remove(GetPath(stroke));
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (var path in ScrollCanvas.Children.Where(x => x is Path).ToList())
+                    {
+                        ScrollCanvas.Children.Remove(path);
+                    }
+
+                    //ScrollCanvas.Children.Clear();
+                    for (int i = 0, count = Characters.Count; i < count; i++)
+                    {
+                        RenderCharacter(i, Characters[i]);
+                    }
+                    break;
+            }
+        }
+
+        private void RenderCharacter(int index, Char chr)
+        {
+            double shiftX;
+            double shiftY;
+            double scaleX;
+            double scaleY;
+            CalcScaleInformation(chr, CharacterSize, index,
+                out shiftX, out shiftY, out scaleX, out scaleY);
+
+            // TODO Make it inside Char
+            foreach (var stroke in chr.Strokes)
+            {
+                var path = ConvertStrokeToPath(stroke, shiftX, shiftY, scaleX, scaleY);
+                AddChild(path);
+            }
+        }
+
+        public void Clear()
+        {
+            ScrollCanvas.Children.Clear();
+        }
+
+        public void AddChild(FrameworkElement child)
+        {
+            if (child.Parent != null)
+            {
+                (child.Parent as Panel).Children.Remove(child);
+            }
+            if (!ScrollCanvas.Children.Contains(child))
+            {
+                ScrollCanvas.Children.Add(child);
+            }
+        }
+
+        internal void Repaint()
+        {
+            int count = Characters.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var chr = Characters[i];
+                double shiftX;
+                double shiftY;
+                double scaleX;
+                double scaleY;
+                CalcScaleInformation(chr, CharacterSize, i, out shiftX, out shiftY, out scaleX, out scaleY);
+
+                // TODO Make it inside Char
+                foreach (var stroke in chr.Strokes)
+                {
+                    var path = ConvertStrokeToPath(stroke, shiftX, shiftY, scaleX, scaleY);
+                    AddChild(path);
+                }
+            }
         }
     }
 }

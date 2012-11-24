@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Newtonsoft.Json;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.UI.Input.Inking;
-using Windows.UI.Xaml.Media;
 
 namespace DrawToNote.Datas
 {
@@ -23,7 +21,7 @@ namespace DrawToNote.Datas
             CanvasSize = canvasSize;
             if (manager.GetStrokes().Count == 0)
             {
-                InkBytes = new byte[0];
+                //InkBytes = new byte[0];
             }
             else
             {
@@ -31,21 +29,15 @@ namespace DrawToNote.Datas
             }
         }
 
-        internal Char()
+        public Char()
         {
         }
 
         [JsonProperty]
-        public Brush CharBrush { get; set; }
-
-        [JsonProperty]
-        public double Thickness { get; set; }
-
-        [JsonProperty]
         internal Size CanvasSize { get; set; }
 
-        [JsonProperty]
-        internal byte[] InkBytes { get; set; }
+        //[JsonProperty]
+        //internal byte[] InkBytes { get; set; }
 
         internal ObservableCollection<Stroke> Strokes
         {
@@ -70,22 +62,14 @@ namespace DrawToNote.Datas
             var dataReader = new DataReader(mem);
             await dataReader.LoadAsync((uint)mem.Size);
             dataReader.ReadBytes(bytes);
-            InkBytes = bytes;
+            //InkBytes = bytes;
         }
 
         private void LoadStrokeData(InkManager manager)
         {
             foreach (var stroke in manager.GetStrokes())
             {
-                strokes.Add(new Stroke(stroke, CanvasSize));
-            }
-        }
-
-        public void Delete()
-        {
-            foreach (var stroke in strokes)
-            {
-                stroke.Delete();
+                strokes.Add(new Stroke(stroke));
             }
         }
     }

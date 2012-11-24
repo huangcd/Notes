@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="27805HUANGCD.DrawToNote" Publisher="CN=6FC72C23-D8AC-4EE2-B49E-DFC07295D5E4" Version="1.0.0.2" />
+  <Identity Name="27805HUANGCD.DrawToNote" Publisher="CN=6FC72C23-D8AC-4EE2-B49E-DFC07295D5E4" Version="1.0.0.7" />
   <Properties>
     <DisplayName>Draw To Note</DisplayName>
     <PublisherDisplayName>HUANGCD</PublisherDisplayName>
@@ -11,21 +11,21 @@
     <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
   </Prerequisites>
   <Resources>
-    <Resource Language="x-generate" />
+    <Resource Language="en-US" />
+    <Resource Language="zh-CN" />
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Notes.App">
-      <VisualElements DisplayName="Draw To Note" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Notes" ForegroundText="light" BackgroundColor="#464646">
-        <DefaultTile ShowName="logoOnly" />
+      <VisualElements DisplayName="Draw To Note" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Notes" ForegroundText="light" BackgroundColor="#00AEDF">
+        <DefaultTile ShowName="allLogos" />
         <SplashScreen Image="Assets\SplashScreen.png" />
         <InitialRotationPreference>
           <Rotation Preference="portrait" />
           <Rotation Preference="landscape" />
+          <Rotation Preference="portraitFlipped" />
+          <Rotation Preference="landscapeFlipped" />
         </InitialRotationPreference>
       </VisualElements>
     </Application>
   </Applications>
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
 </Package>

@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using DrawToNote.Datas;
+using DrawToNote.Pages;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using DrawToNote.Pages;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -42,6 +34,22 @@ namespace DrawToNote
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
+            var setting = ApplicationData.Current.LocalSettings;
+            Object obj = setting.Values["AppHasBeenStarted"];
+            if (obj == null)
+            {
+                // First Time
+                setting.Values["AppHasBeenStarted"] = "AppHasBeenStarted";
+                ScriptManager.Instance.Add(Script.LoadAsync(HowToUse.Data));
+            }
+
+            //if (args.PreviousExecutionState != ApplicationExecutionState.Running)
+            //{
+            //    bool loadState = (args.PreviousExecutionState == ApplicationExecutionState.Terminated);
+            //    ExtendSplashScreen extendedSplash = new ExtendSplashScreen(args.SplashScreen, loadState);
+            //    Window.Current.Content = extendedSplash;
+            //}
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -65,11 +73,12 @@ namespace DrawToNote
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(ScriptPage), args.Arguments))
+                if (!rootFrame.Navigate(typeof(NotesPage), args.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }
             }
+
             // Ensure the current window is active
             Window.Current.Activate();
         }
@@ -81,10 +90,12 @@ namespace DrawToNote
         /// </summary>
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
+
             //TODO: Save application state and stop any background activity
+            await ScriptManager.Instance.CurrentScript.SaveAsync();
             deferral.Complete();
         }
     }

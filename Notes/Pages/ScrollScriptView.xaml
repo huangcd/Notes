@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible" x:Name="scrollViewer">
-        <Canvas x:Name="ScrollCanvas" Margin="0, 0, 0, 0" Width="{Binding ActualWidth, ElementName=scrollViewer}" Background="#FF00AEEF"/>
-    </ScrollViewer>
+    d:DesignWidth="400"
+    x:Name="Self">
+    <Canvas x:Name="ScrollCanvas" Width="{Binding ActualWidth, ElementName=Self}" Background="#FFF2C1"/>
 </UserControl>

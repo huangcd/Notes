@@ -114,13 +114,19 @@
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Datas\Char.cs" />
-    <Compile Include="Datas\JsonExtensions.cs" />
     <Compile Include="Common\LayoutAwarePage.cs" />
-    <Compile Include="Datas\SampleData.cs" />
+    <Compile Include="Datas\HowToUse.cs" />
     <Compile Include="Datas\ScriptManager.cs" />
     <Compile Include="Datas\Scripts.cs" />
+    <Compile Include="Datas\StringProvider.cs" />
     <Compile Include="Datas\Stroke.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Pages\ExtendSplashScreen.xaml.cs">
+      <DependentUpon>ExtendSplashScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\LineWidthSelector.xaml.cs">
+      <DependentUpon>LineWidthSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\NotesPage.xaml.cs">
       <DependentUpon>NotesPage.xaml</DependentUpon>
     </Compile>
@@ -142,8 +148,15 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <PRIResource Include="Strings\zh-CN\Resources.resw">
+      <SubType>Designer</SubType>
+    </PRIResource>
+    <PRIResource Include="Strings\en-US\Resources.resw">
+      <SubType>Designer</SubType>
+    </PRIResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\background.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
@@ -164,6 +177,14 @@
     <Page Include="Common\StandardStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\ExtendSplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\LineWidthSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\NotesPage.xaml">
       <SubType>Designer</SubType>
@@ -186,6 +207,11 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.10\lib\winrt45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="Callisto, Version=1.2.5">
+      <Name>Callisto</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Windows.Foundation;
 using Windows.UI.Input.Inking;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
+using System;
 
 namespace DrawToNote.Datas
 {
     internal class Stroke
     {
-        private List<BezierSegment> segments = new List<BezierSegment>();
-        private Path path;
+        [JsonIgnore]
+        private List<BezierSegment> _segments = new List<BezierSegment>();
 
-        public Stroke(InkStroke stroke, Size size)
+        public Stroke(InkStroke stroke, [CallerMemberName] string methodName = "")
         {
             var renderStrokes = stroke.GetRenderingSegments();
             StartPoint = renderStrokes.First().Position;
@@ -28,44 +29,55 @@ namespace DrawToNote.Datas
                     Point3 = renderStroke.Position
                 });
             }
-            CanvasSize = size;
         }
 
-        internal Stroke()
+        public Stroke()
         {
         }
 
         [JsonProperty]
-        internal List<BezierSegment> BezierSegments { get { return segments; } }
+        internal String BezierSegmentsStr
+        {
+            get
+            {
+                return String.Join(",", BezierSegments.Select(x => x.ToJson()));
+            }
+            private set
+            {
+                _segments = new List<BezierSegment>();
+                string[] strings = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var array = strings.Select(Convert.ToDouble).ToArray();
+                if (array.Length > 0)
+                {
+                    StartPoint = new Point(array[0], array[1]);
+                }
+                for (int i = 0; i < array.Length; )
+                {
+                    _segments.Add(new BezierSegment
+                    {
+                        Point1 = new Point(array[i++], array[i++]),
+                        Point2 = new Point(array[i++], array[i++]),
+                        Point3 = new Point(array[i++], array[i++])
+                    });
+                }
+            }
+        }
+
+        [JsonIgnore]
+        internal List<BezierSegment> BezierSegments { get { return _segments; } }
 
         [JsonProperty]
-        internal Size CanvasSize { get; set; }
+        internal double LineWidth { get; set; }
 
         [JsonProperty]
+        internal Brush Brush { get; set; }
+
+        [JsonIgnore]
         internal Point StartPoint { get; set; }
 
-        public Path AsPath(Brush brush, double thickness, double shiftX, double shiftY, double scaleX, double scaleY, double opacity = 1)
+        public Path CreatePath()
         {
-            if (path == null)
-            {
-                CreatePath();
-            }
-
-            path.StrokeThickness = thickness;
-            path.Stroke = brush;
-            path.Opacity = opacity;
-            path.RenderTransform = new ScaleTransform
-            {
-                ScaleX = scaleX,
-                ScaleY = scaleY
-            };
-            path.Margin = new Thickness(shiftX, shiftY, 0, 0);
-            return path;
-        }
-
-        private void CreatePath()
-        {
-            path = new Windows.UI.Xaml.Shapes.Path();
+            Path path = new Windows.UI.Xaml.Shapes.Path();
             path.Data = new PathGeometry();
             (path.Data as PathGeometry).Figures = new PathFigureCollection();
             PathFigure pathFigure = new PathFigure();
@@ -80,14 +92,23 @@ namespace DrawToNote.Datas
                     Point3 = segments.Point3
                 });
             }
+            return path;
+        }
+    }
+
+    public static class JsonExtension
+    {
+        public static string ToJson(this double val)
+        {
+            return string.Format("{0:0.00}", val);
         }
 
-        public void Delete()
+        public static string ToJson(this BezierSegment val)
         {
-            if (path.Parent != null && path.Parent is Canvas)
-            {
-                (path.Parent as Canvas).Children.Remove(path);
-            }
+            return string.Join(",", 
+                val.Point1.X.ToJson(), val.Point1.Y.ToJson(), 
+                val.Point2.X.ToJson(), val.Point2.Y.ToJson(), 
+                val.Point3.X.ToJson(), val.Point3.Y.ToJson());
         }
     }
 }

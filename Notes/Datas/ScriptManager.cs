@@ -1,37 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
+using DrawToNote.Common;
+using DrawToNote.Pages;
 using Windows.Foundation;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
-using System;
-using Windows.Storage.Streams;
-using System.Linq;
-using Windows.UI.Popups;
 
 namespace DrawToNote.Datas
 {
-    public class ScriptManager : IEnumerable<Script>
+    public class ScriptManager : BindableBase, IEnumerable<Script>
     {
-        private static readonly ScriptManager instance = new ScriptManager();
+        #region Getter, Setter
+
+        private static readonly ScriptManager _instance = new ScriptManager();
+        private static int RecentScriptLimit = 3;
         private Script _current;
         private InkManager _inkManager = new InkManager();
-        private ObservableCollection<Script> scripts = new ObservableCollection<Script>();
-        private ObservableCollection<Script> recentScripts = new ObservableCollection<Script>();
-        StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+        private ObservableCollection<Script> _recentScripts = new ObservableCollection<Script>();
+        private ObservableCollection<Script> _scripts = new ObservableCollection<Script>();
 
         private ScriptManager()
         {
-            CreateScript();
+            Scripts.CollectionChanged += scripts_CollectionChanged;
         }
 
         public static ScriptManager Instance
         {
             get
             {
-                return instance;
+                return _instance;
             }
         }
 
@@ -41,22 +46,92 @@ namespace DrawToNote.Datas
             {
                 return _current;
             }
+            set
+            {
+                SetProperty(ref _current, value);
+            }
+        }
+
+        public ObservableCollection<Script> RecentScripts
+        {
+            get
+            {
+                return _recentScripts;
+            }
+        }
+
+        public ObservableCollection<Script> Scripts
+        {
+            get
+            {
+                return _scripts;
+            }
         }
 
         public Script this[int index]
         {
             get
             {
-                return scripts[index];
+                return Scripts[index];
             }
         }
 
+        public int Count
+        {
+            get
+            {
+                return Scripts.Count;
+            }
+        }
+
+        #endregion Getter, Setter
+
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            foreach (var script in scripts)
+            foreach (var script in Scripts)
             {
                 yield return script;
             }
+        }
+
+        public void Add(Script script)
+        {
+            lock (Scripts)
+            {
+                var index = 0;
+                var size = Scripts.Count;
+                for (index = 0; index < size; index++)
+                {
+                    if (Scripts[index] == script)
+                    {
+                        // Already exists
+                        return;
+                    }
+                    if (Scripts[index] < script)
+                    {
+                        break;
+                    }
+                }
+                Scripts.Insert(index, script);
+                script.PropertyChanged += script_PropertyChanged;
+            }
+        }
+
+        private void script_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "LastModifyDate")
+            {
+                Script script = sender as Script;
+                Remove(script);
+                Add(script);
+            }
+        }
+
+        public async void Remove(Script script)
+        {
+            Scripts.Remove(script);
+            script.PropertyChanged -= script_PropertyChanged;
+            await script.DeleteFile();
         }
 
         /// <summary>
@@ -101,40 +176,117 @@ namespace DrawToNote.Datas
         ///
         /// </summary>
         /// <returns></returns>
-        public List<Windows.UI.Xaml.Shapes.Path> ConfirmCharacter(Size charSize, Size noteSize, Size canvasSize)
+        public void ConfirmCharacter(Size charSize, Size noteSize, Size canvasSize, ScrollScriptView parent)
         {
             var list = new List<Windows.UI.Xaml.Shapes.Path>();
             Char chr = new Char(_inkManager, canvasSize);
-            return CurrentScript.AddAndRender(chr, charSize, noteSize);
+            CurrentScript.Add(chr);
+
+            //CurrentScript.AddAndRender(chr, charSize, noteSize, parent);
         }
 
         public void CreateScript()
         {
             if (_current != null)
             {
-                _current.SaveAsync(ApplicationData.Current.LocalFolder);
+                _current.Save();
             }
             _current = new Script();
-            _current.DefaultCharColor = new Color
-            {
-                R = 0,
-                G = 0,
-                B = 166,
-                A = 255,
-            };
-            _current.DefaultThickness = 8.0;
-            scripts.Add(_current);
+            Add(_current);
         }
 
         public IEnumerator<Script> GetEnumerator()
         {
-            foreach (var script in scripts)
+            foreach (var script in Scripts)
             {
                 yield return script;
             }
         }
 
+        public async Task LoadScriptsAsync()
+        {
+            var files = await ApplicationData.Current.LocalFolder.GetFilesAsync();
+            foreach (var file in files)
+            {
+                try
+                {
+                    IBuffer buffer = await FileIO.ReadBufferAsync(file);
+                    Script script = Script.LoadAsync(buffer);
+                    Add(script);
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
+            if (Scripts.Count > 0)
+            {
+                _current = Scripts.First();
+            }
+        }
+
+        private void scripts_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts.Insert(e.NewStartingIndex, Scripts[e.NewStartingIndex]);
+                        if (RecentScripts.Count > RecentScriptLimit)
+                        {
+                            RecentScripts.RemoveAt(RecentScriptLimit);
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    if (e.OldStartingIndex < RecentScriptLimit && e.NewStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    }
+                    else if (e.OldStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts.RemoveAt(e.OldStartingIndex);
+                        RecentScripts.Add(Scripts[RecentScriptLimit - 1]);
+                    }
+                    else if (e.NewStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts.Insert(e.NewStartingIndex, Scripts[e.NewStartingIndex]);
+                        RecentScripts.RemoveAt(RecentScriptLimit);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts.RemoveAt(e.OldStartingIndex);
+                        if (Scripts.Count >= RecentScriptLimit)
+                        {
+                            RecentScripts.Add(Scripts[RecentScriptLimit - 1]);
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.OldStartingIndex < RecentScriptLimit)
+                    {
+                        RecentScripts[e.OldStartingIndex] = Scripts[e.OldStartingIndex];
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    RecentScripts.Clear();
+                    while (RecentScripts.Count < Scripts.Count && RecentScripts.Count < RecentScriptLimit)
+                    {
+                        RecentScripts.Add(Scripts[RecentScripts.Count]);
+                    }
+                    break;
+            }
+        }
+
         #region event handler
+
         public IReadOnlyList<InkStroke> GetStrokes()
         {
             return _inkManager.GetStrokes();
@@ -156,28 +308,6 @@ namespace DrawToNote.Datas
             return _inkManager.ProcessPointerUpdate(pointerPoint);
         }
 
-        internal void RepaintAll(Size noteSize, Size charSize)
-        {
-            CurrentScript.RepaintAll(noteSize: noteSize, charSize: charSize);
-        }
-        #endregion
-
-        public async Task<ObservableCollection<Script>> LoadScriptsAsync()
-        {
-            var files = await ApplicationData.Current.LocalFolder.GetFilesAsync();
-            foreach (var file in files)
-            {
-                await new MessageDialog(file.Path).ShowAsync();
-            }
-            var tasks = files.Select(file => Task.Run(
-                async () => {
-                    IBuffer buffer = await FileIO.ReadBufferAsync(file);
-                    Script script = new Script();
-                    script.LoadAsync(buffer);
-                    scripts.Add(script);
-                }));
-            var results = Task.WhenAll(tasks);
-            return scripts;
-        }
+        #endregion event handler
     }
 }

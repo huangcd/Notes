@@ -1,85 +1,227 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using DrawToNote.Common;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Windows.Foundation;
+using Windows.Globalization.DateTimeFormatting;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Popups;
-using Windows.UI.Xaml.Media;
+using System.Reflection.Emit;
+using System.Reflection.Context;
+using Newtonsoft.Json.Linq;
 
 namespace DrawToNote.Datas
 {
-    public class Script
+    public class Script : BindableBase, IComparable<Script>
     {
         private const String FileSufix = ".js";
         private const double ScaleConstance = 1.2;
+        private static readonly DateTimeFormatter datefmt = new DateTimeFormatter("shortdate");
+        private readonly static object LockObject = new object();
+        private static readonly DateTimeFormatter timefmt = new DateTimeFormatter("shorttime");
+        private static UTF8Encoding encoding = new UTF8Encoding();
+        [JsonIgnore]
+        private bool startMonitorModify = false;
+
+        // This must be the first field to store
+        [JsonProperty("_createDate")]
+        private DateTime _____createDate = DateTime.Now;
 
         [JsonProperty]
-        internal ObservableCollection<Char> characters = new ObservableCollection<Char>();
+        private ObservableCollection<Char> _characters = new ObservableCollection<Char>();
 
-        private static UTF8Encoding encoding = new UTF8Encoding();
+        [JsonProperty]
+        private DateTime _lastModifyDate = DateTime.Now;
+
+        [JsonProperty]
+        private String _title = StringProvider.GetValue("NewScriptName");
+
         public Script()
         {
-            CreateDate = DateTime.Now;
-            Title = "New Script";
+            Characters.CollectionChanged += characters_CollectionChanged;
         }
 
-        public int Count { get { return characters.Count; } }
+        public event NotifyCollectionChangedEventHandler ScriptChanged;
 
-        [JsonProperty]
-        public Color DefaultCharColor { get; set; }
+        [JsonIgnore]
+        public ObservableCollection<Char> Characters
+        {
+            get
+            {
+                return _characters;
+            }
+        }
 
-        [JsonProperty]
-        public double DefaultThickness { get; set; }
+        [JsonIgnore]
+        public int Count
+        {
+            get
+            {
+                return Characters.Count;
+            }
+        }
 
-        [JsonProperty]
-        internal DateTime CreateDate { get; set; }
+        [JsonIgnore]
+        public String CreateDateStr
+        {
+            get
+            {
+                return datefmt.Format(CreateDate) + " " + timefmt.Format(CreateDate);
+            }
+        }
 
-        [JsonProperty]
-        public String Title { get; set; }
+        [JsonIgnore]
+        public String ModifyDateStr
+        {
+            get
+            {
+                return datefmt.Format(LastModifyDate) + " " + timefmt.Format(LastModifyDate);
+            }
+        }
+
+        [JsonIgnore]
+        public String Title
+        {
+            get
+            {
+                return _title;
+            }
+            set
+            {
+                SetProperty(ref _title, value);
+            }
+        }
+
+        [JsonIgnore]
+        internal DateTime CreateDate
+        {
+            get
+            {
+                return _____createDate;
+            }
+            set
+            {
+                SetProperty(ref _____createDate, value);
+            }
+        }
+
+        [JsonIgnore]
+        internal DateTime LastModifyDate
+        {
+            get
+            {
+                return _lastModifyDate;
+            }
+            set
+            {
+                SetProperty(ref _lastModifyDate, value);
+                if (startMonitorModify)
+                {
+                    lock (LockObject)
+                    {
+                        Save();
+                    }
+                }
+            }
+        }
 
         public Char this[int index]
         {
             get
             {
-                return characters[index];
+                return Characters[index];
             }
+        }
+
+        public static Script LoadAsync(IBuffer buffer)
+        {
+            lock (LockObject)
+            {
+                byte[] bytes = buffer.ToArray();
+                String content = encoding.GetString(bytes, 0, bytes.Length);
+                return LoadAsync(content);
+            }
+        }
+
+        public static Script LoadAsync(String content)
+        {
+            // OldData
+            if (content.Contains("StartPoint"))
+            {
+                try
+                {
+                    content = HandlingOldData(content);
+                }
+                catch (Exception)
+                {
+                }
+            }
+            Script script = JsonConvert.DeserializeObject<Script>(content);
+            script.startMonitorModify = true;
+            return script;
+        }
+
+        private static string HandlingOldData(string content)
+        {
+            JObject obj = JObject.Parse(content);
+            JArray chrArray = obj["_characters"] as JArray;
+            foreach (var tok in chrArray)
+            {
+                JObject chr = tok as JObject;
+                JArray strokeArray = chr["strokes"] as JArray;
+                foreach (var stk in strokeArray)
+                {
+                    JObject stroke = stk as JObject;
+                    stroke.Remove("StartPoint");
+                    JArray segments = stroke["BezierSegments"] as JArray;
+                    String segmentsStr = String.Join(",", segments.Select(ConvertBezierSegment));
+                    stroke.Remove("BezierSegments");
+                    stroke.Add("BezierSegmentsStr", new JValue(segmentsStr));
+                }
+            }
+            return obj.ToString();
+        }
+
+        private static String ConvertBezierSegment(JToken segment)
+        {
+            return String.Join(",",
+                (segment["Point1"]["X"] as JValue).Value, (segment["Point1"]["Y"] as JValue).Value,
+                (segment["Point2"]["X"] as JValue).Value, (segment["Point3"]["Y"] as JValue).Value,
+                (segment["Point2"]["X"] as JValue).Value, (segment["Point3"]["Y"] as JValue).Value);
+        }
+
+        public static bool operator !=(Script s1, Script s2)
+        {
+            return !(s1 == s2);
+        }
+
+        public static bool operator <(Script s1, Script s2)
+        {
+            return s1.LastModifyDate < s2.LastModifyDate;
+        }
+
+        public static bool operator ==(Script s1, Script s2)
+        {
+            object obj = s1 as object;
+            if (obj == null) return ((s2 as object) == null);
+            return s1.Equals(s2);
+        }
+
+        public static bool operator >(Script s1, Script s2)
+        {
+            return s1.LastModifyDate > s2.LastModifyDate;
         }
 
         public void Add(Char chr)
         {
-            characters.Add(chr);
-        }
-
-        public List<Windows.UI.Xaml.Shapes.Path> AddAndRender(Char chr, Size charSize, Size noteSize)
-        {
-            int index = Count;
-            Add(chr);
-            double shiftX;
-            double shiftY;
-            double scaleX;
-            double scaleY;
-            CalcScaleInformation(chr, ref charSize, ref noteSize, index, out shiftX, out shiftY, out scaleX, out scaleY);
-            var paths = new List<Windows.UI.Xaml.Shapes.Path>();
-            Brush brush = new SolidColorBrush(DefaultCharColor);
-            foreach (var stroke in chr.Strokes)
-            {
-                paths.Add(stroke.AsPath(brush, DefaultThickness, shiftX, shiftY, scaleX, scaleY));
-            }
-            return paths;
-        }
-
-        public void RemoveLast()
-        {
-            characters[characters.Count - 1].Delete();
-            characters.RemoveAt(characters.Count - 1);
+            Characters.Add(chr);
         }
 
         /// <summary>
@@ -87,89 +229,108 @@ namespace DrawToNote.Datas
         /// </summary>
         public void Clear()
         {
-            foreach (var chr in characters)
+            Characters.Clear();
+            LastModifyDate = DateTime.Now;
+        }
+
+        public int CompareTo(Script other)
+        {
+            return other._lastModifyDate.CompareTo(this._lastModifyDate);
+        }
+
+        public async Task DeleteFile()
+        {
+            try
             {
-                chr.Delete();
+                StorageFolder folder = ApplicationData.Current.LocalFolder;
+                String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
+                var asyncTask = folder.GetFileAsync(fileName);
+                var file = await asyncTask;
+                if (asyncTask.Status == AsyncStatus.Completed)
+                {
+                    await file.DeleteAsync();
+                }
             }
-            characters.Clear();
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Script))
+            {
+                return false;
+            }
+            return this.CreateDate == (obj as Script).CreateDate;
         }
 
         public IEnumerator<Char> GetEnumerator()
         {
-            foreach (var chr in characters)
+            foreach (var chr in Characters)
             {
                 yield return chr;
             }
         }
 
-        public async Task LoadAsync(IInputStream input)
+        public override int GetHashCode()
         {
-            Stream stream = input.AsStreamForRead();
-            int length = (int)stream.Length;
-            byte[] bytes = new byte[length];
-            await stream.ReadAsync(bytes, 0, length);
-            String content = encoding.GetString(bytes, 0, length);
-            JObject obj = (JObject)JsonConvert.DeserializeObject(content);
-            this.LoadFromJObject(obj);
+            return CreateDate.GetHashCode();
         }
 
-        public void LoadAsync(IBuffer buffer)
+        public void RemoveLast()
         {
-            byte[] bytes = buffer.ToArray();
-            String content = encoding.GetString(bytes, 0, bytes.Length);
-            JObject obj = (JObject)JsonConvert.DeserializeObject(content);
-            this.LoadFromJObject(obj);
+            if (Characters.Count > 0)
+            {
+                Characters.RemoveAt(Characters.Count - 1);
+                LastModifyDate = DateTime.Now;
+            }
         }
 
-        public async void SaveAsync(StorageFolder folder)
+        public async void Save()
+        {
+            await SaveAsync();
+        }
+
+        public async Task SaveAsync()
+        {
+            StorageFolder folder = ApplicationData.Current.LocalFolder;
+            await SaveAsync(folder);
+        }
+
+        private void characters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            LastModifyDate = DateTime.Now;
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    break;
+            }
+            var eventHandler = this.ScriptChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, e);
+            }
+        }
+
+        private async Task SaveAsync(StorageFolder folder)
         {
             String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
             StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this));
-        }
-
-        public async void SaveAsync(IOutputStream output)
-        {
-            JObject obj = this.ToJsonObject();
-            byte[] bytes = encoding.GetBytes(obj.ToString());
-            await output.WriteAsync(bytes.AsBuffer());
-        }
-
-        internal void RepaintAll(Size noteSize, Size charSize)
-        {
-            int count = Count;
-            for (int i = 0; i < count; i++)
-            {
-                var chr = this[i];
-                double shiftX;
-                double shiftY;
-                double scaleX;
-                double scaleY;
-                CalcScaleInformation(chr, ref charSize, ref noteSize, i, out shiftX, out shiftY, out scaleX, out scaleY);
-                Brush brush = new SolidColorBrush(DefaultCharColor);
-                foreach (var stroke in chr.Strokes)
-                {
-                    stroke.AsPath(brush, DefaultThickness, shiftX, shiftY, scaleX, scaleY);
-                }
-            }
-        }
-        private static void CalcScaleInformation(
-            Char chr,
-            ref Size charSize,
-            ref Size noteSize,
-            int index,
-            out double shiftX,
-            out double shiftY,
-            out double scaleX,
-            out double scaleY)
-        {
-            int columnCount = (int)(noteSize.Width / charSize.Width);
-            int row = index / columnCount;
-            int column = index % columnCount;
-            shiftX = column * charSize.Width;
-            shiftY = row * charSize.Height;
-            scaleX = charSize.Width * ScaleConstance / chr.CanvasSize.Width;
-            scaleY = charSize.Height * ScaleConstance / chr.CanvasSize.Height;
+            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }
 }
