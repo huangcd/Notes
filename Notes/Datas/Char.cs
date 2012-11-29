@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,12 @@ namespace DrawToNote.Datas
             {
                 LoadData(manager);
             }
+        }
+
+        public Char(IEnumerable<Stroke> strokes, Size canvasSize)
+        {
+            CanvasSize = canvasSize;
+            this.strokes = new ObservableCollection<Stroke>(strokes);
         }
 
         public Char()
@@ -62,6 +69,7 @@ namespace DrawToNote.Datas
             var dataReader = new DataReader(mem);
             await dataReader.LoadAsync((uint)mem.Size);
             dataReader.ReadBytes(bytes);
+
             //InkBytes = bytes;
         }
 

@@ -150,4 +150,19 @@
   <data name="RecentScriptString" xml:space="preserve">
     <value>RECENT SCRIPTS</value>
   </data>
+  <data name="NoResultsTextBlock.Text" xml:space="preserve">
+    <value>No results match your search.</value>
+  </data>
+  <data name="ResultFor.Text" xml:space="preserve">
+    <value>Results for&amp;#x00a0;</value>
+  </data>
+  <data name="ScriptTemplateCreateTextBlock.Text" xml:space="preserve">
+    <value>CREATE</value>
+  </data>
+  <data name="ScriptTemplateModifyTextBlock.Text" xml:space="preserve">
+    <value>MODIFY</value>
+  </data>
+  <data name="ScriptTemplateTitleTextBlock.Text" xml:space="preserve">
+    <value>TITLE</value>
+  </data>
 </root>

@@ -354,9 +354,11 @@
     <ReservedNames>
       <ReservedName>Draw To Note</ReservedName>
       <ReservedName>随手写</ReservedName>
+      <ReservedName>涂鸦笔记</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
   <AccountPackageIdentityNames>
+    <MainPackageIdentityName>27805HUANGCD.CrazyWords</MainPackageIdentityName>
     <MainPackageIdentityName>27805HUANGCD.6285213613FD4</MainPackageIdentityName>
     <MainPackageIdentityName>27805HUANGCD.579332975D0DF</MainPackageIdentityName>
     <MainPackageIdentityName>27805HUANGCD.33973EC440931</MainPackageIdentityName>
@@ -364,7 +366,7 @@
   <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/c65b3a27-465b-4e86-9ac8-c312f7d71ef8">
     <PackageInfo>
       <PackageArchitecture>neutral</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.6</PackageMaxArchitectureVersion>
+      <PackageMaxArchitectureVersion>1.0.0.7</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>

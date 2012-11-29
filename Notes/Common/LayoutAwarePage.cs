@@ -7,10 +7,6 @@ using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Templated Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234235
@@ -220,7 +216,7 @@ namespace DrawToNote.Common
             }
         }
 
-        #endregion
+        #endregion Navigation support
 
         #region Visual state switching
 
@@ -321,7 +317,7 @@ namespace DrawToNote.Common
             }
         }
 
-        #endregion
+        #endregion Visual state switching
 
         #region Process lifetime management
 
@@ -400,7 +396,7 @@ namespace DrawToNote.Common
         {
         }
 
-        #endregion
+        #endregion Process lifetime management
 
         /// <summary>
         /// Implementation of IObservableMap that supports reentrancy for use as a default view
@@ -417,10 +413,12 @@ namespace DrawToNote.Common
                 }
 
                 public CollectionChange CollectionChange { get; private set; }
+
                 public K Key { get; private set; }
             }
 
             private Dictionary<K, V> _dictionary = new Dictionary<K, V>();
+
             public event MapChangedEventHandler<K, V> MapChanged;
 
             private void InvokeMapChanged(CollectionChange change, K key)

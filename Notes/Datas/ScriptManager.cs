@@ -176,13 +176,10 @@ namespace DrawToNote.Datas
         ///
         /// </summary>
         /// <returns></returns>
-        public void ConfirmCharacter(Size charSize, Size noteSize, Size canvasSize, ScrollScriptView parent)
+        public void ConfirmCharacter(Size canvasSize, List<Stroke> strokes)
         {
-            var list = new List<Windows.UI.Xaml.Shapes.Path>();
-            Char chr = new Char(_inkManager, canvasSize);
+            Char chr = new Char(strokes, canvasSize);
             CurrentScript.Add(chr);
-
-            //CurrentScript.AddAndRender(chr, charSize, noteSize, parent);
         }
 
         public void CreateScript()

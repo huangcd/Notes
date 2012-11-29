@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using DrawToNote.Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Foundation;
 using Windows.Globalization.DateTimeFormatting;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using System.Reflection.Emit;
-using System.Reflection.Context;
-using Newtonsoft.Json.Linq;
 
 namespace DrawToNote.Datas
 {
@@ -27,6 +24,7 @@ namespace DrawToNote.Datas
         private readonly static object LockObject = new object();
         private static readonly DateTimeFormatter timefmt = new DateTimeFormatter("shorttime");
         private static UTF8Encoding encoding = new UTF8Encoding();
+
         [JsonIgnore]
         private bool startMonitorModify = false;
 
@@ -295,8 +293,19 @@ namespace DrawToNote.Datas
 
         public async Task SaveAsync()
         {
-            StorageFolder folder = ApplicationData.Current.LocalFolder;
-            await SaveAsync(folder);
+            bool succeed = false;
+            while (!succeed)
+            {
+                try
+                {
+                    StorageFolder folder = ApplicationData.Current.LocalFolder;
+                    await SaveAsync(folder);
+                    succeed = true;
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
 
         private void characters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -330,7 +339,7 @@ namespace DrawToNote.Datas
         {
             String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
             StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this, Formatting.Indented));
+            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this));
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -132,8 +130,10 @@ namespace DrawToNote.Common
 
         private static DependencyProperty FrameSessionStateKeyProperty =
             DependencyProperty.RegisterAttached("_FrameSessionStateKey", typeof(String), typeof(SuspensionManager), null);
+
         private static DependencyProperty FrameSessionStateProperty =
             DependencyProperty.RegisterAttached("_FrameSessionState", typeof(Dictionary<String, Object>), typeof(SuspensionManager), null);
+
         private static List<WeakReference<Frame>> _registeredFrames = new List<WeakReference<Frame>>();
 
         /// <summary>
@@ -242,6 +242,7 @@ namespace DrawToNote.Common
             frameState["Navigation"] = frame.GetNavigationState();
         }
     }
+
     public class SuspensionManagerException : Exception
     {
         public SuspensionManagerException()
@@ -251,7 +252,6 @@ namespace DrawToNote.Common
         public SuspensionManagerException(Exception e)
             : base("SuspensionManager failed", e)
         {
-
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Callisto.Controls;
 using DrawToNote.Common;
 using DrawToNote.Datas;
 using Windows.Devices.Input;
@@ -12,12 +13,10 @@ using Windows.UI.Input;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
-using Callisto.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Popups;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -29,8 +28,7 @@ namespace DrawToNote.Pages
     public sealed partial class ScriptPage : LayoutAwarePage
     {
         private Dictionary<InkStroke, Path> _strokeMaps = new Dictionary<InkStroke, Path>();
-        private Brush _lineStroke = new SolidColorBrush(new Color { R = 0, G = 0, B = 0, A = 255 });
-        private double _lineThickness = 8.0;
+        private List<Stroke> _strokeCached = new List<Stroke>();
         private Button clearButton;
         private Button confirmButton;
         private Point currentPoint;
@@ -82,15 +80,15 @@ namespace DrawToNote.Pages
         {
             get
             {
-                return _lineThickness;
+                return DefaultValue.DefaultLineWidth;
             }
             set
             {
-                if (_lineThickness == value)
+                if (DefaultValue.DefaultLineWidth == value)
                 {
                     return;
                 }
-                _lineThickness = value;
+                DefaultValue.DefaultLineWidth = value;
                 HandlerLineThicknessChanged();
             }
         }
@@ -150,10 +148,16 @@ namespace DrawToNote.Pages
             }
         }
 
-        private Brush LineStroke
+        private SolidColorBrush LineStroke
         {
-            get { return _lineStroke; }
-            set { _lineStroke = value; }
+            get
+            {
+                return new SolidColorBrush(DefaultValue.DefaultLineColor);
+            }
+            set
+            {
+                DefaultValue.DefaultLineColor = value.Color;
+            }
         }
 
         private Path GetPathFromStrokes(InkStroke stroke, double scale = 1, double opacity = 1)
@@ -206,8 +210,10 @@ namespace DrawToNote.Pages
         private void ClearInkStrokes()
         {
             scriptManager.ClearInkStrokes();
+
             // TODO test whether it's OK to clear
             _strokeMaps.Clear();
+            _strokeCached.Clear();
         }
 
         private void ConfigInkAttributes()
@@ -237,7 +243,7 @@ namespace DrawToNote.Pages
             //AppBarNewScriptButton.Click += AppBarNewScriptButton_Click;
         }
 
-        void LineWidthButton_Click(object sender, RoutedEventArgs e)
+        private void LineWidthButton_Click(object sender, RoutedEventArgs e)
         {
             Flyout f = new Flyout();
 
@@ -319,10 +325,7 @@ namespace DrawToNote.Pages
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             scriptManager.ConfirmCharacter(
-                NotePad.CharacterSize,
-                NotePad.RenderSize,
-                DrawPad.RenderSize,
-                NotePad);
+                DrawPad.RenderSize, _strokeCached);
             ClearButton_Click(sender, null);
             _inSpecialRegion = false;
         }
@@ -420,11 +423,19 @@ namespace DrawToNote.Pages
             {
                 PointerPoint pt = e.GetCurrentPoint(DrawPad);
                 scriptManager.ProcessPointerUp(pt);
-                ClearDrawPad();
-                foreach (InkStroke stroke in scriptManager.GetStrokes())
-                {
-                    RenderStrokeOnDrawPad(stroke);
-                }
+
+                //ClearDrawPad();
+                InkStroke inkStroke = scriptManager.GetStrokes().Last();
+                Stroke stroke = new Stroke(inkStroke);
+                stroke.LineWidth = LineThickness;
+                stroke.Brush = LineStroke;
+                RenderStrokeOnDrawPad(inkStroke);
+                _strokeCached.Add(stroke);
+
+                //foreach (InkStroke stroke in scriptManager.GetStrokes())
+                //{
+                //    RenderStrokeOnDrawPad(stroke);
+                //}
             }
             else if (e.Pointer.PointerId == touchId)
             {
@@ -436,6 +447,14 @@ namespace DrawToNote.Pages
         }
 
         #endregion DrawPad Actions
+
+        private void RenderStrokeOnDrawPad(Stroke stroke, double opacity = 1)
+        {
+            Path path = stroke.CreatePath();
+            path.StrokeThickness = stroke.LineWidth;
+            path.Stroke = stroke.Brush;
+            path.Opacity = opacity;
+        }
 
         private void RenderStrokeOnDrawPad(InkStroke stroke, double opacity = 1)
         {
@@ -450,6 +469,7 @@ namespace DrawToNote.Pages
             //    {
             ClearButton_Click(sender, null);
             NotePad.Repaint();
+
             //});
         }
 
@@ -466,6 +486,7 @@ namespace DrawToNote.Pages
         }
 
         #region Storyboard
+
         private void Storyboard_Completed_Portrait(object sender, object e)
         {
             RePaint(sender);
@@ -484,7 +505,20 @@ namespace DrawToNote.Pages
         private void Storyboard_Completed_Snapped(object sender, object e)
         {
             RePaint(sender);
-        } 
-        #endregion
+        }
+
+        #endregion Storyboard
+
+        private void ColoredRectangleButton_Check(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            foreach (var child in LeftTopCommands.Children)
+            {
+                if (child is ColoredRectangleButton && !child.Equals(sender) && (child as ColoredRectangleButton).Checked)
+                {
+                    (child as ColoredRectangleButton).Checked = false;
+                }
+            }
+            LineStroke = (sender as ColoredRectangleButton).ButtonColor;
+        }
     }
 }

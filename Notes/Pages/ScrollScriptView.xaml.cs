@@ -53,7 +53,7 @@ namespace DrawToNote.Pages
         }
 
         private readonly DependencyProperty ThicknessProperty =
-            DependencyProperty.Register("LineWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(8.0));
+            DependencyProperty.Register("LineWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(DefaultValue.DefaultLineWidth));
 
         public bool Snapshot
         {
@@ -226,8 +226,8 @@ namespace DrawToNote.Pages
             double opacity = 1)
         {
             Path path = GetPath(stroke);
-            path.StrokeThickness = LineWidth;
-            path.Stroke = Foreground;
+            path.StrokeThickness = stroke.LineWidth;
+            path.Stroke = stroke.Brush;
             path.Opacity = opacity;
             path.RenderTransform = new ScaleTransform
             {

@@ -1,39 +1,49 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
-using System;
 
 namespace DrawToNote.Datas
 {
-    internal class Stroke
+    public class Stroke
     {
-        [JsonIgnore]
-        private List<BezierSegment> _segments = new List<BezierSegment>();
-
-        public Stroke(InkStroke stroke, [CallerMemberName] string methodName = "")
+        [JsonProperty]
+        internal double LineWidth
         {
-            var renderStrokes = stroke.GetRenderingSegments();
-            StartPoint = renderStrokes.First().Position;
-            foreach (var renderStroke in renderStrokes)
+            get
             {
-                BezierSegments.Add(new BezierSegment
-                {
-                    Point1 = renderStroke.BezierControlPoint1,
-                    Point2 = renderStroke.BezierControlPoint2,
-                    Point3 = renderStroke.Position
-                });
+                return _lineWidth == 0 ? DefaultValue.DefaultLineWidth : _lineWidth;
+            }
+            set
+            {
+                _lineWidth = value;
             }
         }
 
-        public Stroke()
+        [JsonProperty]
+        internal Color _color;
+
+        [JsonIgnore]
+        internal SolidColorBrush Brush
         {
+            get
+            {
+                return _color == null ? new SolidColorBrush(DefaultValue.DefaultLineColor) : new SolidColorBrush(_color);
+            }
+            set
+            {
+                _color = value.Color;
+            }
         }
+
+        [JsonProperty]
+        internal double Opacity { get { return _opacity; } set { _opacity = value; } }
 
         [JsonProperty]
         internal String BezierSegmentsStr
@@ -64,20 +74,40 @@ namespace DrawToNote.Datas
         }
 
         [JsonIgnore]
+        internal double _lineWidth;
+        [JsonIgnore]
+        internal double _opacity;
+        [JsonIgnore]
+        private List<BezierSegment> _segments = new List<BezierSegment>();
+
+        [JsonIgnore]
         internal List<BezierSegment> BezierSegments { get { return _segments; } }
-
-        [JsonProperty]
-        internal double LineWidth { get; set; }
-
-        [JsonProperty]
-        internal Brush Brush { get; set; }
 
         [JsonIgnore]
         internal Point StartPoint { get; set; }
 
+        public Stroke(InkStroke stroke, [CallerMemberName] string methodName = "")
+        {
+            var renderStrokes = stroke.GetRenderingSegments();
+            StartPoint = renderStrokes.First().Position;
+            foreach (var renderStroke in renderStrokes)
+            {
+                BezierSegments.Add(new BezierSegment
+                {
+                    Point1 = renderStroke.BezierControlPoint1,
+                    Point2 = renderStroke.BezierControlPoint2,
+                    Point3 = renderStroke.Position
+                });
+            }
+        }
+
+        public Stroke()
+        {
+        }
+
         public Path CreatePath()
         {
-            Path path = new Windows.UI.Xaml.Shapes.Path();
+            Path path = new Path();
             path.Data = new PathGeometry();
             (path.Data as PathGeometry).Figures = new PathFigureCollection();
             PathFigure pathFigure = new PathFigure();
@@ -105,9 +135,9 @@ namespace DrawToNote.Datas
 
         public static string ToJson(this BezierSegment val)
         {
-            return string.Join(",", 
-                val.Point1.X.ToJson(), val.Point1.Y.ToJson(), 
-                val.Point2.X.ToJson(), val.Point2.Y.ToJson(), 
+            return string.Join(",",
+                val.Point1.X.ToJson(), val.Point1.Y.ToJson(),
+                val.Point2.X.ToJson(), val.Point2.Y.ToJson(),
                 val.Point3.X.ToJson(), val.Point3.Y.ToJson());
         }
     }

@@ -1,0 +1,14 @@
+﻿<Page
+    x:Class="DrawToNote.Pages.Splash"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DrawToNote.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#00AEDF">
+        <Image x:Name="StartupSplashImage" Source="../Assets/SplashScreen.png" Width="620" Height="300" />
+        <ProgressRing x:Name="StartupProgress" IsActive="True" Visibility="Collapsed" Background="Transparent" />
+    </Grid>
+</Page>

@@ -4,8 +4,6 @@ using DrawToNote.Common;
 using DrawToNote.Datas;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -22,6 +20,7 @@ namespace DrawToNote.Pages
         public NotesPage()
         {
             this.InitializeComponent();
+
             //this.Background = new ImageBrush
             //{
             //    ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/background.png")),
@@ -38,30 +37,18 @@ namespace DrawToNote.Pages
         /// </param>
         /// <param name="pageState">A dictionary of state preserved by this page during an earlier
         /// session.  This will be null the first time a page is visited.</param>
-        protected override async void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
-            if (navigationParameter != null && navigationParameter is Script)
-            {
-                this.DefaultViewModel["ScriptGroup"] = new[]
-                {
-                    new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
-                    new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
-                };
-            }
-            else
-            {
-                // TODO: If there isn't a file in the localState, add a script to demostrate how to use directly.
-                this.DefaultViewModel["ScriptGroup"] = new[]
+            // TODO: If there isn't a file in the localState, add a script to demostrate how to use directly.
+            this.DefaultViewModel["ScriptGroup"] = new[]
                 {
                     new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
                     new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
                 };
 
-                await scriptManager.LoadScriptsAsync();
-                if (scriptManager.CurrentScript == null)
-                {
-                    this.Frame.Navigate(typeof(ScriptPage));
-                }
+            if (scriptManager.CurrentScript == null)
+            {
+                this.Frame.Navigate(typeof(ScriptPage));
             }
         }
 

@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="zh-Hant" original="DrawToNote_Multilingual.prilog.xml" tool-id="MultilingualAppToolkit" product-name="DrawToNote" product-version="Version 1" build-num="1.0.0.0">
+    <header>
+      <tool tool-id="MultilingualAppToolkit" tool-name="Multilingual App Toolkit" tool-version="1.0" tool-company="Microsoft" />
+    </header>
+    <body>
+      <group id="Resources">
+        <trans-unit id="Resources\AddScriptButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>ADD</source>
+          <target state="translated">添加</target>
+        </trans-unit>
+        <trans-unit id="Resources\AllScriptString" translate="yes" xml:space="preserve">
+          <source>ALL SCRIPTS</source>
+          <target state="translated">所有筆記</target>
+        </trans-unit>
+        <trans-unit id="Resources\Application\Text" translate="yes" xml:space="preserve">
+          <source>Draw To Note</source>
+          <target state="translated">隨手記</target>
+        </trans-unit>
+        <trans-unit id="Resources\ClearString" translate="yes" xml:space="preserve">
+          <source>CLEAR</source>
+          <target state="translated">清空</target>
+        </trans-unit>
+        <trans-unit id="Resources\DeleteScriptButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>DELETE</source>
+          <target state="translated"> 刪除</target>
+        </trans-unit>
+        <trans-unit id="Resources\LineWidthButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>LINE WIDTH</source>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">線寬</target>
+        </trans-unit>
+        <trans-unit id="Resources\ClearScriptButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>CLEAR</source>
+          <target state="translated">清空</target>
+        </trans-unit>
+        <trans-unit id="Resources\BackspaceButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>DELETE</source>
+          <target state="translated"> 刪除</target>
+        </trans-unit>
+        <trans-unit id="Resources\NewScriptName" translate="yes" xml:space="preserve">
+          <source>New Script</source>
+          <target state="translated">新筆記</target>
+        </trans-unit>
+        <trans-unit id="Resources\NewString" translate="yes" xml:space="preserve">
+          <source>NEW</source>
+          <target state="translated">創建筆記</target>
+        </trans-unit>
+        <trans-unit id="Resources\RecentScriptString" translate="yes" xml:space="preserve">
+          <source>RECENT SCRIPTS</source>
+          <target state="translated">最近筆記</target>
+        </trans-unit>
+        <trans-unit id="Resources\NoResultsTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>No results match your search.</source>
+          <target state="translated">沒有匹配您搜索的結果。</target>
+        </trans-unit>
+        <trans-unit id="Resources\ResultFor\Text" translate="yes" xml:space="preserve">
+          <source>Results for%%amp;#x00a0;</source>
+          <target state="new">Results for%%amp;#x00a0;</target>
+        </trans-unit>
+        <trans-unit id="Resources\ScriptTemplateCreateTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>CREATE</source>
+          <target state="new">CREATE</target>
+        </trans-unit>
+        <trans-unit id="Resources\ScriptTemplateModifyTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>MODIFY</source>
+          <target state="new">MODIFY</target>
+        </trans-unit>
+        <trans-unit id="Resources\ScriptTemplateTitleTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>TITLE</source>
+          <target state="new">TITLE</target>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

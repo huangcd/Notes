@@ -11,10 +11,10 @@
 
     <Grid Background="#FFABD3E2">
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Slider Grid.Row="0" Maximum="20" Minimum="2" Value="8" x:Name="LineWidthSlider"></Slider>
-        <TextBlock Foreground="Blue" Grid.Row="1" Text="{Binding Value, ElementName=LineWidthSlider}" TextAlignment="Center" FontSize="40" Margin="3, 3, 3, 3"/>
+        <TextBlock Foreground="Blue" Grid.Row="1" Text="{Binding Value, ElementName=LineWidthSlider}" TextAlignment="Center" FontSize="40" Margin="3, 3, 3, 3" />
     </Grid>
 </UserControl>

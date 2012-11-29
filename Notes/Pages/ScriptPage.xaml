@@ -10,143 +10,164 @@
     x:Name="PageRoot"
     mc:Ignorable="d">
 
-    <Grid
-          Style="{StaticResource AppDefaultRootStyle}">
+    <Grid x:Name="RootGrid" Style="{StaticResource AppDefaultRootStyle}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ApplicationViewStates">
                 <VisualState x:Name="FullScreenLandscape">
-                    <Storyboard Completed="Storyboard_Completed_Landscape"/>
+                    <Storyboard Completed="Storyboard_Completed_Landscape" />
                 </VisualState>
                 <VisualState x:Name="Filled">
                     <Storyboard Completed="Storyboard_Completed_Filled"></Storyboard>
                 </VisualState>
                 <VisualState x:Name="Snapped">
                     <Storyboard Completed="Storyboard_Completed_Snapped">
-                        <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="ContextGrid"
-                            Storyboard.TargetProperty="(Grid.RowDefinitions)[1].Height">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="*"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="ContextGrid"
-                            Storyboard.TargetProperty="(Grid.ColumnDefinitions)[1].Width">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Auto"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
+                        <ObjectAnimationUsingKeyFrames
                             Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Column)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
+                        <ObjectAnimationUsingKeyFrames
                             Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="DrawPad"
+                            Storyboard.TargetProperty="(Grid.ColumnSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="2" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="scrollViewer"
+                            Storyboard.TargetProperty="(Grid.RowSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="scrollViewer"
+                            Storyboard.TargetProperty="(Grid.ColumnSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="2" />
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="FullScreenPortrait">
                     <Storyboard Completed="Storyboard_Completed_Portrait">
-                        <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="ContextGrid"
-                            Storyboard.TargetProperty="(Grid.RowDefinitions)[1].Height">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="*"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
-                            Storyboard.TargetName="ContextGrid"
-                            Storyboard.TargetProperty="(Grid.ColumnDefinitions)[1].Width">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Auto"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
+                        <ObjectAnimationUsingKeyFrames
                             Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Column)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames 
+                        <ObjectAnimationUsingKeyFrames
                             Storyboard.TargetName="DrawPad"
                             Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="DrawPad"
+                            Storyboard.TargetProperty="(Grid.ColumnSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="2" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="scrollViewer"
+                            Storyboard.TargetProperty="(Grid.RowSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="scrollViewer"
+                            Storyboard.TargetProperty="(Grid.ColumnSpan)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="2" />
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="140" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid x:Name="ContextGrid" Grid.Row="1" Margin="20,0,20,40">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Canvas Grid.Column="1" x:Name="DrawPad" Margin="20, 20, 20, 20" Background="#FF2CA1F0"/>
-            <ScrollViewer Grid.Column="0" HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch" 
-                  VerticalScrollBarVisibility="Visible"
-                  VerticalScrollMode="Enabled"
-                  HorizontalScrollMode="Disabled"
-                  Margin="20, 20, 20, 20" 
-                  x:Name="scrollViewer">
-                <pages:ScrollScriptView Grid.Column="0" 
-                                    x:Name="NotePad" 
+            <Canvas Grid.Column="1" Grid.RowSpan="2"
+                    x:Name="DrawPad"
+                    Margin="20, 20, 20, 20"
+                    Background="#FF2CA1F0" />
+            <ScrollViewer Grid.Column="0"
+                          Grid.RowSpan="2"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          VerticalScrollBarVisibility="Visible"
+                          VerticalScrollMode="Enabled"
+                          HorizontalScrollMode="Disabled"
+                          Margin="20, 20, 20, 20"
+                          x:Name="scrollViewer">
+                <pages:ScrollScriptView Grid.Column="0"
+                                    x:Name="NotePad"
                                     Foreground="Black"
                                     LineWidth="8"
-                                    CanvasBackground="White" 
-                                    CharacterWidth="60" 
+                                    CanvasBackground="White"
+                                    CharacterWidth="60"
                                     CharacterHeight="60"
                                     HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"/>
+                                    VerticalAlignment="Stretch" />
             </ScrollViewer>
         </Grid>
 
         <Grid Grid.Row="0" Margin="20, 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="BackButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=PageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBox x:Name="pageTitle" Grid.Column="1" Text="{Binding Title}" Style="{StaticResource AppDefaultHeaderTextBoxStyle}" TextChanged="ScriptTitle_TextChanged" Height="86"/>
+            <Button x:Name="BackButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=PageRoot}" Style="{StaticResource BackButtonStyle}" />
+            <TextBox x:Name="pageTitle" Grid.Column="1" Text="{Binding Title}" Style="{StaticResource AppDefaultHeaderTextBoxStyle}" TextChanged="ScriptTitle_TextChanged" Height="86" />
         </Grid>
     </Grid>
-    <!--<Page.TopAppBar>
+
+    <Page.TopAppBar>
         <AppBar x:Name="PageTopAppBar" Padding="10, 0, 10, 0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*"/>
-                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="LeftTopCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <pages:ColoredRectangleButton ButtonColor="Red" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Orange" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Yellow" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Green" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Blue" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Purple" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton ButtonColor="Black" Checked="True" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
                 </StackPanel>
             </Grid>
         </AppBar>
-    </Page.TopAppBar>-->
+    </Page.TopAppBar>
     <Page.BottomAppBar>
         <AppBar x:Name="PageBottomAppBar" Padding="10, 0, 10, 0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*"/>
-                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
                 </Grid.ColumnDefinitions>
-                <StackPanel x:Name="LeftCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
-                    <Button x:Name="AppBarClearButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
-                            AutomationProperties.Name="CLEAR" Content="&#xE1CD;" x:Uid="ClearScriptButton"/>
-                    <Button x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
-                            AutomationProperties.Name="DELETE" Content="&#xE083;" x:Uid="BackspaceButton"/>
-                    <!--<Button x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
-                            AutomationProperties.Name="NEW" Content="&#x271A;"/>
-                    <Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
-                            AutomationProperties.Name="SAVE" Content="&#xE105;"/>-->
-                    <!--<Button x:Name="AppBarLoadButton" HorizontalAlignment="Left" Style="{StaticResource AppBarButtonStyle}" 
-                            AutomationProperties.Name="LOAD" Content="&#x23EB;"/>-->
+                <StackPanel x:Name="LeftBottomCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <Button x:Name="AppBarClearButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="CLEAR" Content="&#xE1CD;" x:Uid="ClearScriptButton" />
+                    <Button x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="DELETE" Content="&#xE083;" x:Uid="BackspaceButton" />
+                    <!--<Button x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="NEW" Content="&#x271A;" />
+                    <Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="SAVE" Content="&#xE105;" />-->
+                    <!--<Button x:Name="AppBarLoadButton" HorizontalAlignment="Left" Style="{StaticResource AppBarButtonStyle}"
+                            AutomationProperties.Name="LOAD" Content="&#x23EB;" />-->
                 </StackPanel>
-                <StackPanel x:Name="RightCommands" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                    <Button x:Name="LineWidthButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}" 
-                            AutomationProperties.Name="Line Width" Content="&#xE104;" x:Uid="LineWidthButton"/>
+                <StackPanel x:Name="RightBottomCommands" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                    <Button x:Name="LineWidthButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="Line Width" Content="&#xE104;" x:Uid="LineWidthButton" />
                 </StackPanel>
             </Grid>
         </AppBar>
