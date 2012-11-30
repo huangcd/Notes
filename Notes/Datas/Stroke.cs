@@ -34,7 +34,7 @@ namespace DrawToNote.Datas
         {
             get
             {
-                return _color == null ? new SolidColorBrush(DefaultValue.DefaultLineColor) : new SolidColorBrush(_color);
+                return new SolidColorBrush(_color);
             }
             set
             {

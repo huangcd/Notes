@@ -65,6 +65,7 @@ namespace DrawToNote.Pages
         {
             this.InitializeComponent();
             HandleEvents();
+            BlackColoredRectangleButton.Checked = true;
             ConfigInkAttributes();
             HandleResource();
         }

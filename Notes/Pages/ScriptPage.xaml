@@ -135,13 +135,13 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="LeftTopCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
-                    <pages:ColoredRectangleButton ButtonColor="Red" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Orange" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Yellow" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Green" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Blue" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Purple" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton ButtonColor="Black" Checked="True" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="RedColoredRectangleButton" ButtonColor="Red" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="OrangeColoredRectangleButton" ButtonColor="Orange" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="YellowColoredRectangleButton" ButtonColor="Yellow" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="GreenColoredRectangleButton" ButtonColor="Green" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="BlueColoredRectangleButton" ButtonColor="Blue" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="PurpleColoredRectangleButton" ButtonColor="Purple" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    <pages:ColoredRectangleButton x:Name="BlackColoredRectangleButton" ButtonColor="Black" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
                 </StackPanel>
             </Grid>
         </AppBar>
