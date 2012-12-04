@@ -1,23 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawToNote", "Notes\DrawToNote.csproj", "{7A77D5D7-226E-4D37-AF32-8BAD3FBA0B32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawToNote", "DrawToNote\DrawToNote.csproj", "{7A77D5D7-226E-4D37-AF32-8BAD3FBA0B32}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestForNotes", "UnitTestForNotes\UnitTestForNotes.csproj", "{76CEA4C1-FE9A-46ED-B2C0-7C291DA70151}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://msra-tfs1:8080/tfs/ieg
-		SccProjectUniqueName0 = UnitTestForNotes\\UnitTestForNotes.csproj
-		SccProjectName0 = UnitTestForNotes
-		SccLocalPath0 = UnitTestForNotes
-		SccProjectUniqueName1 = Notes\\DrawToNote.csproj
-		SccProjectName1 = Notes
-		SccLocalPath1 = Notes
-		SccLocalPath2 = .
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
