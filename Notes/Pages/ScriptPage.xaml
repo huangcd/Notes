@@ -96,7 +96,7 @@
             <Canvas Grid.Column="1" Grid.RowSpan="2"
                     x:Name="DrawPad"
                     Margin="20, 20, 20, 20"
-                    Background="#FF2CA1F0" />
+                    Background="{StaticResource ScriptBackground}" />
             <ScrollViewer Grid.Column="0"
                           Grid.RowSpan="2"
                           HorizontalAlignment="Stretch"
@@ -123,8 +123,17 @@
                 <ColumnDefinition Width="140" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="BackButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=PageRoot}" Style="{StaticResource BackButtonStyle}" />
-            <TextBox x:Name="pageTitle" Grid.Column="1" Text="{Binding Title}" Style="{StaticResource AppDefaultHeaderTextBoxStyle}" TextChanged="ScriptTitle_TextChanged" Height="86" />
+            <Button x:Name="BackButton" 
+                    Click="GoBack" 
+                    IsEnabled="{Binding Frame.CanGoBack, ElementName=PageRoot}" 
+                    Style="{StaticResource BackButtonStyle}" />
+            <TextBox 
+                x:Name="pageTitle" 
+                Grid.Column="1" 
+                Text="{Binding Title}" 
+                Style="{StaticResource AppDefaultHeaderTextBoxStyle}" 
+                TextChanged="ScriptTitle_TextChanged" 
+                Height="86"/>
         </Grid>
     </Grid>
 

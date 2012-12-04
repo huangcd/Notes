@@ -63,9 +63,9 @@
                                     Click="Header_Click"
                                     Style="{StaticResource TextPrimaryButtonStyle}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Title}" Margin="3,-7,10,10" Style="{StaticResource GroupHeaderTextStyle}" />
+                                        <TextBlock Text="{Binding Title}" Margin="3,-7,10,10" Style="{StaticResource DefaultGroupHeaderTextStyle}" />
                                         <TextBlock Text="{StaticResource ChevronGlyph}" FontFamily="Segoe UI Symbol" Margin="0,-7,0,10"
-                                                   Style="{StaticResource GroupHeaderTextStyle}" />
+                                                   Style="{StaticResource DefaultGroupHeaderTextStyle}" />
                                     </StackPanel>
                                 </Button>
                             </Grid>

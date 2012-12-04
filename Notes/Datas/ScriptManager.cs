@@ -147,32 +147,6 @@ namespace DrawToNote.Datas
         }
 
         /// <summary>
-        /// 设置InkManager笔画的形状
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="size"></param>
-        /// <param name="fitToCurve"></param>
-        /// <param name="ignorePressure"></param>
-        /// <param name="penTip"></param>
-        public void ConfigInkDrawingAttributes(
-            Color color,
-            Size size,
-            bool fitToCurve = true,
-            bool ignorePressure = false,
-            PenTipShape penTip = PenTipShape.Circle)
-        {
-            var attributes = new InkDrawingAttributes
-            {
-                Color = color,
-                Size = size,
-                FitToCurve = fitToCurve,
-                IgnorePressure = ignorePressure,
-                PenTip = penTip
-            };
-            _inkManager.SetDefaultDrawingAttributes(attributes);
-        }
-
-        /// <summary>
         ///
         /// </summary>
         /// <returns></returns>

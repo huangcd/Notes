@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="#00AEDF">
+    <Grid Background="#2C86EE">
         <Image x:Name="StartupSplashImage" Source="../Assets/SplashScreen.png" Width="620" Height="300" />
         <ProgressRing x:Name="StartupProgress" IsActive="True" Visibility="Collapsed" Background="Transparent" />
     </Grid>

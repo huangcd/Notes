@@ -7,6 +7,12 @@
         <ResourceDictionary Source="/Common/StandardStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <SolidColorBrush x:Key="DefaultForeground" Color="#2C86EE" />
+    <SolidColorBrush x:Key="InverseDefaultForeground" Color="#D37911" />
+    <SolidColorBrush x:Key="DefaultBackground" Color="#FFABD3E2" />
+    <SolidColorBrush x:Key="InverseDefaultBackground" Color="#00542C1D" />
+    <SolidColorBrush x:Key="ScriptBackground" Color="#FFF2C1" />
+
     <Style x:Key="ColoredRectangleStyle" TargetType="pages:ColoredRectangleButton">
         <Setter Property="Width" Value="100" />
         <Setter Property="Height" Value="100" />
@@ -18,7 +24,7 @@
         <Setter Property="Typography.StylisticSet20" Value="True" />
         <Setter Property="Typography.DiscretionaryLigatures" Value="True" />
         <Setter Property="Typography.CaseSensitiveForms" Value="True" />
-        <Setter Property="Foreground" Value="#FF0000A6" />
+        <Setter Property="Foreground" Value="{StaticResource DefaultForeground}" />
         <Setter Property="FontSize" Value="56" />
         <Setter Property="FontWeight" Value="Light" />
         <Setter Property="RenderTransform">
@@ -29,7 +35,7 @@
         <Setter Property="TextWrapping" Value="NoWrap" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="Margin" Value="0,0,30,40" />
-        <Setter Property="Background" Value="#FFABD3E2" />
+        <Setter Property="Background" Value="{StaticResource DefaultBackground}" />
     </Style>
 
     <Style x:Key="AppDefaultRootStyle" TargetType="Grid" BasedOn="{StaticResource LayoutRootStyle}">
@@ -38,11 +44,11 @@
                 <ImageBrush ImageSource="ms-appx:///Assets/background.png" Stretch="UniformToFill" />
             </Setter.Value>
         </Setter>-->
-        <Setter Property="Background" Value="#FFABD3E2" />
+        <Setter Property="Background" Value="{StaticResource DefaultBackground}" />
     </Style>
 
     <Style x:Key="AppDefaultHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource PageHeaderTextStyle}">
-        <Setter Property="Foreground" Value="#FF0000A6" />
+        <Setter Property="Foreground" Value="{StaticResource DefaultForeground}" />
     </Style>
 
     <Style x:Key="DefaultAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
@@ -53,9 +59,13 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CustomGroupHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource GroupHeaderTextStyle}">
-        <Setter Property="Foreground" Value="#FFFFFF" />
+    <Style x:Key="CustomItemTextStyle" TargetType="TextBlock" BasedOn="{StaticResource GroupHeaderTextStyle}">
+        <Setter Property="Foreground" Value="White" />
         <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <Style x:Key="DefaultGroupHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource GroupHeaderTextStyle}">
+        <Setter Property="Foreground" Value="{StaticResource DefaultForeground}" />
     </Style>
 
     <Style x:Key="SelectColorButtonStyle" TargetType="Button">
@@ -84,29 +94,29 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <TextBlock x:Uid="ScriptTemplateTitleTextBlock" Text="TITLE" Margin="3,-7,10,10"  HorizontalAlignment="Right"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            Grid.Row="0" Grid.Column="0" />
                 <TextBlock x:Uid="ScriptTemplateCreateTextBlock" Text="CREATE" Margin="3,-7,10,10"  HorizontalAlignment="Right"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            Grid.Row="1" Grid.Column="0" />
                 <TextBlock x:Uid="ScriptTemplateModifyTextBlock" Text="MODIFY" Margin="3,-7,10,10"  HorizontalAlignment="Right"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            Grid.Row="2" Grid.Column="0" />
                 <TextBlock Text="{Binding Title}" Margin="3,-7,10,10"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" />
                 <TextBlock Text="{Binding CreateDateStr}" Margin="3,-7,10,10"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" />
                 <TextBlock Text="{Binding ModifyDateStr}" Margin="3,-7,10,10"
-                           Style="{StaticResource CustomGroupHeaderTextStyle}"
+                           Style="{StaticResource CustomItemTextStyle}"
                            HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1" />
             </Grid>
         </StackPanel>
     </DataTemplate>
 
-    <Style x:Key="AppBarColorButtonStyle" TargetType="ButtonBase">
-        <Setter Property="Foreground" Value="{StaticResource AppBarItemForegroundThemeBrush}" />
+    <Style x:Key="DrawPadButtonStyle" TargetType="ButtonBase">
+        <Setter Property="Foreground" Value="{StaticResource DefaultForeground}" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="FontFamily" Value="Segoe UI Symbol" />
         <Setter Property="FontWeight" Value="Normal" />
@@ -118,7 +128,8 @@
                     <Grid x:Name="RootGrid" Width="110" Background="Transparent">
                         <StackPanel VerticalAlignment="Top" Margin="0,12,0,11">
                             <Grid Width="40" Height="40" Margin="0,0,0,5" HorizontalAlignment="Center">
-                                <TextBlock x:Name="BackgroundGlyph" Text="&#xE0A8;" FontFamily="Segoe UI Symbol" FontSize="53.333" Margin="-4,-19,0,0" Foreground="{TemplateBinding AutomationProperties.Name}" />
+                                <TextBlock x:Name="BackgroundGlyph" Text="&#xE0A8;" FontFamily="Segoe UI Symbol" FontSize="53.333" Margin="-4,-19,0,0"
+                                           Foreground="{StaticResource AppBarItemBackgroundThemeBrush}" />
                                 <TextBlock x:Name="OutlineGlyph" Text="&#xE0A7;" FontFamily="Segoe UI Symbol" FontSize="53.333" Margin="-4,-19,0,0" />
                                 <ContentPresenter x:Name="Content" HorizontalAlignment="Center" Margin="-1,-1,0,0" VerticalAlignment="Center" />
                             </Grid>
@@ -173,24 +184,24 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemPointerOverBackgroundThemeBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemPointerOverForegroundThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource InverseDefaultForeground}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OutlineGlyph" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemForegroundThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource DefaultForeground}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundGlyph" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemForegroundThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource DefaultForeground}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemPressedForegroundThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource InverseDefaultForeground}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Disabled">
+                                <!--<VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OutlineGlyph" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemDisabledForegroundThemeBrush}" />
@@ -202,43 +213,7 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemDisabledForegroundThemeBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                            <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Focused">
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                                Storyboard.TargetName="FocusVisualWhite"
-                                                Storyboard.TargetProperty="Opacity"
-                                                To="1"
-                                                Duration="0" />
-                                        <DoubleAnimation
-                                                Storyboard.TargetName="FocusVisualBlack"
-                                                Storyboard.TargetProperty="Opacity"
-                                                To="1"
-                                                Duration="0" />
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Unfocused" />
-                                <VisualState x:Name="PointerFocused" />
-                            </VisualStateGroup>
-                            <VisualStateGroup x:Name="CheckStates">
-                                <VisualState x:Name="Checked">
-                                    <Storyboard>
-                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetName="OutlineGlyph" Storyboard.TargetProperty="Opacity" />
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundGlyph" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemForegroundThemeBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundCheckedGlyph" Storyboard.TargetProperty="Visibility">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource AppBarItemPressedForegroundThemeBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Unchecked" />
-                                <VisualState x:Name="Indeterminate" />
+                                </VisualState>-->
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                     </Grid>
@@ -247,10 +222,10 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ClearCharButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultAppBarButtonStyle}">
+    <Style x:Key="ClearCharButtonStyle" TargetType="Button" BasedOn="{StaticResource DrawPadButtonStyle}">
         <Setter Property="Content" Value="&#xE10A;" />
     </Style>
-    <Style x:Key="ConfirmCharButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultAppBarButtonStyle}">
+    <Style x:Key="ConfirmCharButtonStyle" TargetType="Button" BasedOn="{StaticResource DrawPadButtonStyle}">
         <Setter Property="Content" Value="&#xE10B;" />
     </Style>
 </ResourceDictionary>

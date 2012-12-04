@@ -9,12 +9,17 @@
     d:DesignHeight="100"
     d:DesignWidth="400">
 
-    <Grid Background="#FFABD3E2">
+    <Grid Background="{StaticResource DefaultBackground}">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Slider Grid.Row="0" Maximum="20" Minimum="2" Value="8" x:Name="LineWidthSlider"></Slider>
-        <TextBlock Foreground="Blue" Grid.Row="1" Text="{Binding Value, ElementName=LineWidthSlider}" TextAlignment="Center" FontSize="40" Margin="3, 3, 3, 3" />
+        <Slider Grid.Row="0" Maximum="20" Minimum="2" Value="8" x:Name="LineWidthSlider" Foreground="{StaticResource DefaultForeground}"></Slider>
+        <TextBlock Foreground="{StaticResource DefaultForeground}" 
+                   Grid.Row="1" 
+                   Text="{Binding Value, ElementName=LineWidthSlider}" 
+                   TextAlignment="Center" 
+                   FontSize="40" 
+                   Margin="3, 3, 3, 3" />
     </Grid>
 </UserControl>

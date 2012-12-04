@@ -9,5 +9,5 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     x:Name="Self">
-    <Canvas x:Name="ScrollCanvas" Width="{Binding ActualWidth, ElementName=Self}" Background="#FFF2C1" />
+    <Canvas x:Name="ScrollCanvas" Width="{Binding ActualWidth, ElementName=Self}" Background="{StaticResource ScriptBackground}" />
 </UserControl>

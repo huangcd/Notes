@@ -16,8 +16,8 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Notes.App">
-      <VisualElements DisplayName="Draw To Note" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Notes" ForegroundText="light" BackgroundColor="#00AEDF">
-        <DefaultTile ShowName="allLogos" />
+      <VisualElements DisplayName="Draw To Note" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Notes" ForegroundText="light" BackgroundColor="#2C86EE">
+        <DefaultTile ShowName="allLogos" WideLogo="Assets\WideLogo.png" />
         <SplashScreen Image="Assets\SplashScreen.png" />
         <InitialRotationPreference>
           <Rotation Preference="portrait" />

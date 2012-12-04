@@ -34,6 +34,10 @@ namespace DrawToNote.Datas
         {
             get
             {
+                if (_color.A == 0)
+                {
+                    _color.A = (byte)255;
+                }
                 return new SolidColorBrush(_color);
             }
             set
