@@ -165,4 +165,10 @@
   <data name="ScriptTemplateTitleTextBlock.Text" xml:space="preserve">
     <value>TITLE</value>
   </data>
+  <data name="SettingTextBlock.Text" xml:space="preserve">
+    <value>Setting</value>
+  </data>
+  <data name="SaveScriptButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>SAVE</value>
+  </data>
 </root>

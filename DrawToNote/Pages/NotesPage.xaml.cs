@@ -46,7 +46,8 @@ namespace DrawToNote.Pages
                     new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
                 };
 
-            if (scriptManager.CurrentScript == null)
+            // If there is no script, create a new Script and redirect to ScriptPage
+            if (scriptManager.Scripts.Count == 0)
             {
                 this.Frame.Navigate(typeof(ScriptPage));
             }
@@ -78,8 +79,8 @@ namespace DrawToNote.Pages
 
         private void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
         {
-            scriptManager.CreateScript();
-            Frame.Navigate(typeof(ScriptPage), scriptManager.CurrentScript);
+            Script newScript = scriptManager.CreateScript();
+            Frame.Navigate(typeof(ScriptPage), newScript);
         }
 
         private void AppBarDeleteButton_Click(object sender, RoutedEventArgs e)

@@ -6,8 +6,11 @@ using DrawToNote.Pages;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media.Animation;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -38,6 +41,8 @@ namespace DrawToNote
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
+            SettingsPane.GetForCurrentView().CommandsRequested += SettingPaneCommandsRequested;
+
             _rootFrame = Window.Current.Content as Frame;
             if (_rootFrame == null)
             {
@@ -79,6 +84,33 @@ namespace DrawToNote
             }
         }
 
+        void SettingPaneCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        {
+            SettingsCommand command = new SettingsCommand("Setting", StringProvider.GetValue("SettingTextBlock.Text"), handler =>
+            {
+                Popup popup = BuildSettingsItem(new SettingPage(), 646);
+                popup.IsOpen = true;
+            });
+            args.Request.ApplicationCommands.Add(command);
+        }
+
+        private Popup BuildSettingsItem(UserControl userControl, int width)
+        {
+            Popup p = new Popup();
+            p.IsLightDismissEnabled = true;
+            p.ChildTransitions = new TransitionCollection();
+            p.ChildTransitions.Add(new PaneThemeTransition
+            {
+                Edge = (SettingsPane.Edge == SettingsEdgeLocation.Right) ? EdgeTransitionLocation.Right : EdgeTransitionLocation.Left
+            });
+            userControl.Width = width;
+            userControl.Height = Window.Current.Bounds.Height;
+            p.Child = userControl;
+            p.SetValue(Canvas.LeftProperty, SettingsPane.Edge == SettingsEdgeLocation.Right ? (Window.Current.Bounds.Width - width) : 0);
+            p.SetValue(Canvas.TopProperty, 0);
+            return p;
+        }
+
         private void RemoveSplash()
         {
             if (_rootFrame != null)
@@ -108,13 +140,22 @@ namespace DrawToNote
         /// </summary>
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private async void OnSuspending(object sender, SuspendingEventArgs e)
+        private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
 
             //TODO: Save application state and stop any background activity
-            await ScriptManager.Instance.CurrentScript.SaveAsync();
+            if (ScriptManager.Instance.CurrentScript != null)
+            {
+                ScriptManager.Instance.CurrentScript.Save();
+            }
+
             deferral.Complete();
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
         }
 
         /// <summary>

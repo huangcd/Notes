@@ -60,15 +60,23 @@
         </trans-unit>
         <trans-unit id="Resources\ScriptTemplateCreateTextBlock\Text" translate="yes" xml:space="preserve">
           <source>CREATE</source>
-          <target state="new">CREATE</target>
+          <target state="translated">創建时间</target>
         </trans-unit>
         <trans-unit id="Resources\ScriptTemplateModifyTextBlock\Text" translate="yes" xml:space="preserve">
           <source>MODIFY</source>
-          <target state="new">MODIFY</target>
+          <target state="translated">修改时间</target>
         </trans-unit>
         <trans-unit id="Resources\ScriptTemplateTitleTextBlock\Text" translate="yes" xml:space="preserve">
           <source>TITLE</source>
-          <target state="new">TITLE</target>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">標題</target>
+        </trans-unit>
+        <trans-unit id="Resources\SettingTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>Setting</source>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">設置</target>
+        </trans-unit>
+        <trans-unit id="Resources\SaveScriptButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>SAVE</source>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">保存</target>
         </trans-unit>
       </group>
     </body>

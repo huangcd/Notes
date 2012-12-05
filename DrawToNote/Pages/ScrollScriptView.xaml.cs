@@ -80,10 +80,10 @@ namespace DrawToNote.Pages
                     return;
                 }
                 SetValue(ThicknessProperty, value);
-                foreach (var path in _cached.Values)
-                {
-                    path.StrokeThickness = value;
-                }
+                //foreach (var path in _cached.Values)
+                //{
+                //    path.StrokeThickness = value;
+                //}
             }
         }
 

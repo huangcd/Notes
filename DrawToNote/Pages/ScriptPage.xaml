@@ -163,14 +163,14 @@
                     <ColumnDefinition Width="50*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="LeftBottomCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <!--<Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="SAVE" Content="&#xE105;" x:Uid="SaveScriptButton" />-->
                     <Button x:Name="AppBarClearButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
                             AutomationProperties.Name="CLEAR" Content="&#xE1CD;" x:Uid="ClearScriptButton" />
                     <Button x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
                             AutomationProperties.Name="DELETE" Content="&#xE083;" x:Uid="BackspaceButton" />
                     <!--<Button x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="NEW" Content="&#x271A;" />
-                    <Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="SAVE" Content="&#xE105;" />-->
+                            AutomationProperties.Name="NEW" Content="&#x271A;" />-->
                     <!--<Button x:Name="AppBarLoadButton" HorizontalAlignment="Left" Style="{StaticResource AppBarButtonStyle}"
                             AutomationProperties.Name="LOAD" Content="&#x23EB;" />-->
                 </StackPanel>

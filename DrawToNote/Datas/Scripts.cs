@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
@@ -12,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using Windows.Foundation;
 using Windows.Globalization.DateTimeFormatting;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
 using Windows.Storage.Streams;
 
 namespace DrawToNote.Datas
@@ -120,13 +122,13 @@ namespace DrawToNote.Datas
             set
             {
                 SetProperty(ref _lastModifyDate, value);
-                if (startMonitorModify)
-                {
-                    lock (LockObject)
-                    {
-                        Save();
-                    }
-                }
+                //if (startMonitorModify)
+                //{
+                //    lock (LockObject)
+                //    {
+                //        Save();
+                //    }
+                //}
             }
         }
 
@@ -249,9 +251,8 @@ namespace DrawToNote.Datas
                     await file.DeleteAsync();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
             }
         }
 
@@ -299,8 +300,7 @@ namespace DrawToNote.Datas
                 try
                 {
                     StorageFolder folder = ApplicationData.Current.LocalFolder;
-                    await SaveAsync(folder);
-                    succeed = true;
+                    succeed = await SaveAsync(folder);
                 }
                 catch (Exception)
                 {
@@ -335,11 +335,55 @@ namespace DrawToNote.Datas
             }
         }
 
-        private async Task SaveAsync(StorageFolder folder)
+        private async Task<String> SerializeToStringAsync()
         {
+            return JsonConvert.SerializeObject(this);
+            //try
+            //{
+            //    String content = await JsonConvert.SerializeObjectAsync(this);
+            //    return content;
+            //}
+            //catch (Exception)
+            //{
+            //    return JsonConvert.SerializeObject(this);
+            //}
+        }
+
+        private async Task<bool> SaveAsync(StorageFolder folder)
+        {
+            Task<String> contentTask = SerializeToStringAsync();
             String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
-            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(this));
+            StorageFile targetFile = await folder.CreateFileAsync(fileName, CreationCollisionOption.OpenIfExists);
+            BasicProperties targetFileProperties = await targetFile.GetBasicPropertiesAsync();
+            // New file, write directly
+            if (targetFileProperties.Size == 0)
+            {
+                await FileIO.WriteTextAsync(targetFile, await contentTask);
+                return true;
+            }
+            // Old file, create a backup file to write and then replace the origion file
+            else
+            {
+                String backupFileName = fileName + ".bak";
+                StorageFile backupFile = await folder.CreateFileAsync(backupFileName, CreationCollisionOption.ReplaceExisting);
+
+                await FileIO.WriteTextAsync(backupFile, await contentTask);
+                BasicProperties properties = await backupFile.GetBasicPropertiesAsync();
+                // write successful, replace the origion file
+                if (properties.Size > 0)
+                {
+                    try
+                    {
+                        await backupFile.MoveAndReplaceAsync(targetFile);
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+                return false;
+            }
         }
     }
 }

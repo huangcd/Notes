@@ -70,6 +70,14 @@
           <source>TITLE</source>
           <target state="needs-review-translation" state-qualifier="mt-suggestion">标题</target>
         </trans-unit>
+        <trans-unit id="Resources\SettingTextBlock\Text" translate="yes" xml:space="preserve">
+          <source>Setting</source>
+          <target state="new">Setting</target>
+        </trans-unit>
+        <trans-unit id="Resources\SaveScriptButton\[using:Windows.UI.Xaml.Automation]AutomationProperties\Name" translate="yes" xml:space="preserve">
+          <source>SAVE</source>
+          <target state="new">SAVE</target>
+        </trans-unit>
       </group>
     </body>
   </file>

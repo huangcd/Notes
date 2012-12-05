@@ -122,18 +122,20 @@ namespace DrawToNote.Pages
 
         protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
         {
+            Script script = null;
             if (navigationParameter == null)
             {
-                scriptManager.CreateScript();
+                script = scriptManager.CreateScript();
             }
             else
             {
-                Script script = navigationParameter as Script;
-                scriptManager.CurrentScript = script;
+                script = navigationParameter as Script;
             }
-            this.DataContext = scriptManager.CurrentScript;
-            NotePad.Characters = scriptManager.CurrentScript.Characters;
+            scriptManager.CurrentScript = script;
+            this.DataContext = script;
+            NotePad.Characters = script.Characters;
         }
+
         private void ClearDrawPad()
         {
             DrawPad.Children.Clear();
@@ -176,6 +178,12 @@ namespace DrawToNote.Pages
             this.Frame.Navigate(typeof(NotesPage), scriptManager.CurrentScript);
         }
 
+        protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            ScriptManager.Instance.CurrentScript = null;
+        }
+
         private async void AppBarClearButton_Click(object sender, RoutedEventArgs e)
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
@@ -194,16 +202,11 @@ namespace DrawToNote.Pages
                 });
         }
 
-        private void AppBarNewScriptButton_Click(object sender, RoutedEventArgs e)
-        {
-            scriptManager.CreateScript();
-        }
-
-        // Save Current Scripts
-        private async void AppBarSaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            await scriptManager.CurrentScript.SaveAsync();
-        }
+        //// Save Current Scripts
+        //private void AppBarSaveButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    scriptManager.CurrentScript.Save();
+        //}
 
         private void HandleEvents()
         {
@@ -214,6 +217,7 @@ namespace DrawToNote.Pages
             DrawPad.PointerEntered += DrawPad_PointerEntered;
 
             //BackButton.Click += BackButton_Click;
+            //AppBarSaveButton.Click += AppBarSaveButton_Click;
             AppBarClearButton.Click += AppBarClearButton_Click;
             AppBarDeleteButton.Click += AppBarDeleteButton_Click;
             LineWidthButton.Click += LineWidthButton_Click;
@@ -241,11 +245,12 @@ namespace DrawToNote.Pages
             selector.ValueChanged += (_sender, _e) =>
             {
                 LineThickness = _e.NewValue;
-                NotePad.LineWidth = LineThickness;
+                // NotePad.LineWidth = LineThickness;
             };
 
             f.IsOpen = true;
         }
+
         private void ScriptTitle_TextChanged(object sender, TextChangedEventArgs e)
         {
             scriptManager.CurrentScript.Title = (sender as TextBox).Text;
@@ -426,6 +431,7 @@ namespace DrawToNote.Pages
             ClearButton_Click(sender, null);
             NotePad.Repaint();
         }
+
         #region Storyboard
 
         private void Storyboard_Completed_Filled(object sender, object e)

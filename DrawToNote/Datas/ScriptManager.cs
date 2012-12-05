@@ -134,9 +134,6 @@ namespace DrawToNote.Datas
             await script.DeleteFile();
         }
 
-        /// <summary>
-        /// 清空当前缓存的笔画
-        /// </summary>
         public void ClearInkStrokes()
         {
             foreach (var stroke in _inkManager.GetStrokes())
@@ -156,14 +153,15 @@ namespace DrawToNote.Datas
             CurrentScript.Add(chr);
         }
 
-        public void CreateScript()
+        public Script CreateScript()
         {
-            if (_current != null)
+            if (CurrentScript != null)
             {
-                _current.Save();
+                CurrentScript.Save();
             }
-            _current = new Script();
-            Add(_current);
+            Script script = new Script();
+            Add(script);
+            return script;
         }
 
         public IEnumerator<Script> GetEnumerator()
@@ -190,10 +188,10 @@ namespace DrawToNote.Datas
                     System.Diagnostics.Debug.WriteLine(e.Message);
                 }
             }
-            if (Scripts.Count > 0)
-            {
-                _current = Scripts.First();
-            }
+            //if (Scripts.Count > 0)
+            //{
+            //    CurrentScript = Scripts.First();
+            //}
         }
 
         private void scripts_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

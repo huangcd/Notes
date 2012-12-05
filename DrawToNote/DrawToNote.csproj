@@ -112,6 +112,7 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Common\MetroEventSource.cs" />
     <Compile Include="Datas\DefaultValue.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Datas\Char.cs" />
@@ -134,6 +135,9 @@
     <Compile Include="Pages\ScriptPage.xaml.cs">
       <DependentUpon>ScriptPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\SettingPage.xaml.cs">
+      <DependentUpon>SettingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Splash.xaml.cs">
       <DependentUpon>Splash.xaml</DependentUpon>
     </Compile>
@@ -154,7 +158,6 @@
     <None Include="MultilingualResources\Chinese %28Traditional%29.xlf" />
     <None Include="MultilingualResources\English.xlf" />
     <None Include="MultilingualResources\French.xlf" />
-    <None Include="MultilingualResources\Japanese %28Japan%29.xlf" />
     <None Include="MultilingualResources\Pseudo Language %28Pseudo%29.xlf" />
     <None Include="Notes_StoreKey.pfx" />
     <None Include="Notes_TemporaryKey.pfx" />
@@ -170,6 +173,7 @@
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\WideLogo.scale-100.png" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +214,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\SettingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\Splash.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -220,14 +228,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Callisto">
+      <HintPath>..\packages\Callisto.1.2.6\lib\winrt45\Callisto.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.10\lib\winrt45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <SDKReference Include="Callisto, Version=1.2.5">
-      <Name>Callisto</Name>
-    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
