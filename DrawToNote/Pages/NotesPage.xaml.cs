@@ -42,7 +42,7 @@ namespace DrawToNote.Pages
             // TODO: If there isn't a file in the localState, add a script to demostrate how to use directly.
             this.DefaultViewModel["ScriptGroup"] = new[]
                 {
-                    new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
+                    //new { Title = StringProvider.GetValue("RecentScriptString"), Scripts = scriptManager.RecentScripts },
                     new { Title = StringProvider.GetValue("AllScriptString"), Scripts = scriptManager.Scripts }
                 };
 

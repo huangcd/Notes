@@ -10,6 +10,7 @@ using Windows.Foundation;
 using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Input.Inking;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -117,7 +118,14 @@ namespace DrawToNote.Pages
             this.InitializeComponent();
             HandleEvents();
             HandleResource();
-            BlackColoredRectangleButton.Checked = true;
+            var buttons = LeftTopCommands.Children.Where(
+                x => x is ColoredRectangleButton && (x as ColoredRectangleButton).ButtonColor.Color == DefaultValue.DefaultLineColor
+                ).ToList();
+            if (buttons.Count > 0)
+            {
+                (buttons[0] as ColoredRectangleButton).Checked = true;
+            }
+            // BlackColoredRectangleButton.Checked = true;
         }
 
         protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
@@ -375,10 +383,16 @@ namespace DrawToNote.Pages
                 (deviceType == PointerDeviceType.Mouse && pt.Properties.IsLeftButtonPressed) ||
                 deviceType == PointerDeviceType.Touch)
             {
-                scriptManager.ProcessPointerDown(pt);
-                penId = pt.PointerId;
+                try
+                {
+                    scriptManager.ProcessPointerDown(pt);
+                    penId = pt.PointerId;
 
-                e.Handled = true;
+                    e.Handled = true;
+                }
+                catch (Exception ex)
+                {
+                }
             }
             else if (deviceType == PointerDeviceType.Mouse && pt.Properties.IsRightButtonPressed)
             {

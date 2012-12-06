@@ -263,6 +263,7 @@ namespace DrawToNote.Datas
 
         public void ProcessPointerDown(PointerPoint pointerPoint)
         {
+            // TODO: 可能出现"平板电脑墨迹错误代码"之类的错误
             _inkManager.ProcessPointerDown(pointerPoint);
         }
 

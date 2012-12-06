@@ -27,9 +27,6 @@ namespace DrawToNote.Datas
         private static readonly DateTimeFormatter timefmt = new DateTimeFormatter("shorttime");
         private static UTF8Encoding encoding = new UTF8Encoding();
 
-        [JsonIgnore]
-        private bool startMonitorModify = false;
-
         // This must be the first field to store
         [JsonProperty("_createDate")]
         private DateTime _____createDate = DateTime.Now;
@@ -164,7 +161,6 @@ namespace DrawToNote.Datas
                 }
             }
             Script script = JsonConvert.DeserializeObject<Script>(content);
-            script.startMonitorModify = true;
             return script;
         }
 
