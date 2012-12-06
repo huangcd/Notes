@@ -11,13 +11,12 @@
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid" Style="{StaticResource AppDefaultRootStyle}">
-
         <Grid.RowDefinitions>
             <RowDefinition Height="140" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="ContextGrid" Grid.Row="1" Margin="20,0,20,40">
+        <Grid x:Name="ContextGrid" Grid.Row="1" Margin="20,0,20,40" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -51,7 +50,7 @@
             </ScrollViewer>
         </Grid>
 
-        <Grid Grid.Row="0" Margin="20, 0">
+        <Grid x:Name="TitleGrid" Grid.Row="0" Margin="20, 0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="140" />
                 <ColumnDefinition Width="*" />
@@ -79,10 +78,16 @@
                 </VisualState>
                 <VisualState x:Name="Snapped">
                     <Storyboard Completed="Storyboard_Completed_Snapped">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnDefinitions)[0].Width" Storyboard.TargetName="TitleGrid">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="68"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.RowDefinitions)[0].Height" Storyboard.TargetName="RootGrid">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="68"/>
+                        </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="DrawPad">
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10</Thickness>
+                                    <Thickness>0,10,0,0</Thickness>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
@@ -117,7 +122,7 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="scrollViewer">
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10</Thickness>
+                                    <Thickness>0,0,0,10</Thickness>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
@@ -135,6 +140,29 @@
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="BackButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>10,0,0,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0,0,8,20</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>40</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <DoubleAnimation Duration="0" To="24" Storyboard.TargetProperty="(Control.FontSize)" Storyboard.TargetName="pageTitle" d:IsOptimized="True"/>
+                
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="FullScreenPortrait">
