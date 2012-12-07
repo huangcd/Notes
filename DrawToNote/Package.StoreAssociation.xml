@@ -363,10 +363,5 @@
     <MainPackageIdentityName>27805HUANGCD.579332975D0DF</MainPackageIdentityName>
     <MainPackageIdentityName>27805HUANGCD.33973EC440931</MainPackageIdentityName>
   </AccountPackageIdentityNames>
-  <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/c65b3a27-465b-4e86-9ac8-c312f7d71ef8">
-    <PackageInfo>
-      <PackageArchitecture>neutral</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.7</PackageMaxArchitectureVersion>
-    </PackageInfo>
-  </PackageInfoList>
+  <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/c65b3a27-465b-4e86-9ac8-c312f7d71ef8" />
 </StoreAssociation>

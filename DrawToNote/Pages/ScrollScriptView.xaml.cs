@@ -248,41 +248,54 @@ namespace DrawToNote.Pages
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    int index = e.NewStartingIndex;
-                    Char chr = Characters[index];
-                    RenderCharacter(index, chr);
+                    CharAdded(e.NewStartingIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    var items = e.OldItems;
-                    foreach (var item in items)
-                    {
-                        foreach (var stroke in (item as Char).Strokes)
-                        {
-                            ScrollCanvas.Children.Remove(GetPath(stroke));
-                        }
-                    }
+                    CharRemoved(e.OldItems);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var path in ScrollCanvas.Children.Where(x => x is Path).ToList())
-                    {
-                        ScrollCanvas.Children.Remove(path);
-                    }
-
-                    //ScrollCanvas.Children.Clear();
-                    for (int i = 0, count = Characters.Count; i < count; i++)
-                    {
-                        RenderCharacter(i, Characters[i]);
-                    }
+                    CharsReset();
                     break;
             }
+        }
+
+        private void CharsReset()
+        {
+            foreach (var path in ScrollCanvas.Children.Where(x => x is Path).ToList())
+            {
+                ScrollCanvas.Children.Remove(path);
+            }
+
+            //ScrollCanvas.Children.Clear();
+            for (int i = 0, count = Characters.Count; i < count; i++)
+            {
+                RenderCharacter(i, Characters[i]);
+            }
+        }
+
+        private void CharRemoved(System.Collections.IList items)
+        {
+            foreach (var item in items)
+            {
+                foreach (var stroke in (item as Char).Strokes)
+                {
+                    ScrollCanvas.Children.Remove(GetPath(stroke));
+                }
+            }
+        }
+
+        private void CharAdded(int index)
+        {
+            Char chr = Characters[index];
+            RenderCharacter(index, chr);
         }
 
         private void RenderCharacter(int index, Char chr)
@@ -319,7 +332,7 @@ namespace DrawToNote.Pages
             }
         }
 
-        internal void Repaint()
+        public void Repaint()
         {
             int count = Characters.Count;
             for (int i = 0; i < count; i++)

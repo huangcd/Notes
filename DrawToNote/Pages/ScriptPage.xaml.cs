@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Callisto.Controls;
 using DrawToNote.Common;
 using DrawToNote.Datas;
@@ -179,11 +180,16 @@ namespace DrawToNote.Pages
 
         #region actions
 
-        protected override void GoBack(object sender, RoutedEventArgs e)
+        protected override async void GoBack(object sender, RoutedEventArgs e)
         {
             NotePad.Clear();
-            scriptManager.CurrentScript.Save();
-            this.Frame.Navigate(typeof(NotesPage), scriptManager.CurrentScript);
+            Script script = scriptManager.CurrentScript;
+            Task task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                script.Save();
+            }).AsTask();
+            this.Frame.Navigate(typeof(NotesPage), script);
+            await task;
         }
 
         protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
@@ -392,15 +398,12 @@ namespace DrawToNote.Pages
                 }
                 catch (Exception ex)
                 {
+                    MetroEventSource.Instance.Error(String.Format("Something bad happend while trigger scriptManager.ProcessPointerDown function: {0}", ex.Message));
                 }
             }
             else if (deviceType == PointerDeviceType.Mouse && pt.Properties.IsRightButtonPressed)
             {
                 // Right Click
-            }
-            else if (deviceType == PointerDeviceType.Touch)
-            {
-                // Touch
             }
         }
 

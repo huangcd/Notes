@@ -10,6 +10,53 @@
     x:Name="PageRoot"
     mc:Ignorable="d">
 
+    <Page.TopAppBar>
+        <AppBar x:Name="PageTopAppBar" Padding="10, 0, 10, 0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Disabled">
+                    <StackPanel x:Name="LeftTopCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                        <pages:ColoredRectangleButton x:Name="RedColoredRectangleButton" ButtonColor="Red" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="OrangeColoredRectangleButton" ButtonColor="Orange" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="YellowColoredRectangleButton" ButtonColor="Yellow" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="GreenColoredRectangleButton" ButtonColor="Green" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="BlueColoredRectangleButton" ButtonColor="Blue" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="PurpleColoredRectangleButton" ButtonColor="Purple" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                        <pages:ColoredRectangleButton x:Name="BlackColoredRectangleButton" ButtonColor="Black" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </AppBar>
+    </Page.TopAppBar>
+    <Page.BottomAppBar>
+        <AppBar x:Name="PageBottomAppBar" Padding="10, 0, 10, 0">
+            <Grid x:Name="PageBottomGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="LeftBottomCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                    <!--<Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="SAVE" Content="&#xE105;" x:Uid="SaveScriptButton" />-->
+                    <Button x:Name="AppBarClearButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="CLEAR" Content="&#xE1CD;" x:Uid="ClearScriptButton" />
+                    <Button x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="DELETE" Content="&#xE083;" x:Uid="BackspaceButton" />
+                    <!--<Button x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="NEW" Content="&#x271A;" />-->
+                    <!--<Button x:Name="AppBarLoadButton" HorizontalAlignment="Left" Style="{StaticResource AppBarButtonStyle}"
+                            AutomationProperties.Name="LOAD" Content="&#x23EB;" />-->
+                </StackPanel>
+                <StackPanel x:Name="RightBottomCommands" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                    <Button x:Name="LineWidthButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
+                            AutomationProperties.Name="Line Width" Content="&#xE104;" x:Uid="LineWidthButton" />
+                </StackPanel>
+            </Grid>
+        </AppBar>
+    </Page.BottomAppBar>
+
     <Grid x:Name="RootGrid" Style="{StaticResource AppDefaultRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="140" />
@@ -67,7 +114,7 @@
                 TextChanged="ScriptTitle_TextChanged" 
                 Height="86"/>
         </Grid>
-        
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ApplicationViewStates">
                 <VisualState x:Name="FullScreenLandscape">
@@ -78,6 +125,12 @@
                 </VisualState>
                 <VisualState x:Name="Snapped">
                     <Storyboard Completed="Storyboard_Completed_Snapped">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnDefinitions)[0].Width" Storyboard.TargetName="PageBottomGrid">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="2*"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnDefinitions)[1].Width" Storyboard.TargetName="PageBottomGrid">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1*"/>
+                        </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnDefinitions)[0].Width" Storyboard.TargetName="TitleGrid">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="68"/>
                         </ObjectAnimationUsingKeyFrames>
@@ -162,7 +215,153 @@
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <DoubleAnimation Duration="0" To="24" Storyboard.TargetProperty="(Control.FontSize)" Storyboard.TargetName="pageTitle" d:IsOptimized="True"/>
-                
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="FullScreenPortrait">
@@ -223,55 +422,156 @@
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="RedColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="OrangeColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="YellowColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="GreenColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="BlueColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="PurpleColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Double>80</x:Double>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="BlackColoredRectangleButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
     </Grid>
-
-    <Page.TopAppBar>
-        <AppBar x:Name="PageTopAppBar" Padding="10, 0, 10, 0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel x:Name="LeftTopCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
-                    <pages:ColoredRectangleButton x:Name="RedColoredRectangleButton" ButtonColor="Red" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="OrangeColoredRectangleButton" ButtonColor="Orange" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="YellowColoredRectangleButton" ButtonColor="Yellow" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="GreenColoredRectangleButton" ButtonColor="Green" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="BlueColoredRectangleButton" ButtonColor="Blue" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="PurpleColoredRectangleButton" ButtonColor="Purple" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                    <pages:ColoredRectangleButton x:Name="BlackColoredRectangleButton" ButtonColor="Black" Style="{StaticResource ColoredRectangleStyle}" Check="ColoredRectangleButton_Check" />
-                </StackPanel>
-            </Grid>
-        </AppBar>
-    </Page.TopAppBar>
-    <Page.BottomAppBar>
-        <AppBar x:Name="PageBottomAppBar" Padding="10, 0, 10, 0">
-            <Grid x:Name="PageBottomGrid">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="50*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel x:Name="LeftBottomCommands" Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
-                    <!--<Button x:Name="AppBarSaveButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="SAVE" Content="&#xE105;" x:Uid="SaveScriptButton" />-->
-                    <Button x:Name="AppBarClearButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="CLEAR" Content="&#xE1CD;" x:Uid="ClearScriptButton" />
-                    <Button x:Name="AppBarDeleteButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="DELETE" Content="&#xE083;" x:Uid="BackspaceButton" />
-                    <!--<Button x:Name="AppBarNewScriptButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="NEW" Content="&#x271A;" />-->
-                    <!--<Button x:Name="AppBarLoadButton" HorizontalAlignment="Left" Style="{StaticResource AppBarButtonStyle}"
-                            AutomationProperties.Name="LOAD" Content="&#x23EB;" />-->
-                </StackPanel>
-                <StackPanel x:Name="RightBottomCommands" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                    <Button x:Name="LineWidthButton" HorizontalAlignment="Left" Style="{StaticResource DefaultAppBarButtonStyle}"
-                            AutomationProperties.Name="Line Width" Content="&#xE104;" x:Uid="LineWidthButton" />
-                </StackPanel>
-            </Grid>
-        </AppBar>
-    </Page.BottomAppBar>
-
 </common:LayoutAwarePage>

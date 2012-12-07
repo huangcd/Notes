@@ -119,12 +119,12 @@ namespace DrawToNote.Datas
 
         private void script_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "LastModifyDate")
-            {
-                Script script = sender as Script;
-                Remove(script);
-                Add(script);
-            }
+            //if (e.PropertyName == "LastModifyDate")
+            //{
+            //    Script script = sender as Script;
+            //    Remove(script);
+            //    Add(script);
+            //}
         }
 
         public async void Remove(Script script)
@@ -179,19 +179,19 @@ namespace DrawToNote.Datas
             {
                 try
                 {
+                    if (!file.Name.EndsWith(Script.FileSufix))
+                    {
+                        continue;
+                    }
                     IBuffer buffer = await FileIO.ReadBufferAsync(file);
                     Script script = Script.LoadAsync(buffer);
                     Add(script);
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    MetroEventSource.Instance.Error(String.Format("Failed to load script from file {0} due to: {1}", file.Name, e.Message));
                 }
             }
-            //if (Scripts.Count > 0)
-            //{
-            //    CurrentScript = Scripts.First();
-            //}
         }
 
         private void scripts_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

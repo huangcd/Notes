@@ -20,7 +20,7 @@ namespace DrawToNote.Datas
 {
     public class Script : BindableBase, IComparable<Script>
     {
-        private const String FileSufix = ".js";
+        public const String FileSufix = ".js";
         private const double ScaleConstance = 1.2;
         private static readonly DateTimeFormatter datefmt = new DateTimeFormatter("shortdate");
         private readonly static object LockObject = new object();
@@ -126,6 +126,15 @@ namespace DrawToNote.Datas
                 //        Save();
                 //    }
                 //}
+            }
+        }
+
+        [JsonIgnore]
+        public string FileName
+        {
+            get
+            {
+                return CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
             }
         }
 
@@ -238,17 +247,18 @@ namespace DrawToNote.Datas
         {
             try
             {
+                MetroEventSource.Instance.Info(String.Format("Trying to delete file {0}", FileName));
                 StorageFolder folder = ApplicationData.Current.LocalFolder;
-                String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
-                var asyncTask = folder.GetFileAsync(fileName);
+                var asyncTask = folder.GetFileAsync(FileName);
                 var file = await asyncTask;
                 if (asyncTask.Status == AsyncStatus.Completed)
                 {
                     await file.DeleteAsync();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                MetroEventSource.Instance.Info(String.Format("Failed to delete file {0} due to: {1}", FileName, e.Message));
             }
         }
 
@@ -290,18 +300,23 @@ namespace DrawToNote.Datas
 
         public async Task SaveAsync()
         {
+            int times = 0;
             bool succeed = false;
             while (!succeed)
             {
                 try
                 {
+                    times++;
                     StorageFolder folder = ApplicationData.Current.LocalFolder;
+                    MetroEventSource.Instance.Info(String.Format("Trying to save script {0}", this.Title));
                     succeed = await SaveAsync(folder);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    MetroEventSource.Instance.Error(String.Format("Failed to save script \"{0}\" due to Exception: {1}", this.Title, ex.Message));
                 }
             }
+            MetroEventSource.Instance.Info(String.Format("Succeed in saving script {0}", this.Title));
         }
 
         private void characters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -348,8 +363,7 @@ namespace DrawToNote.Datas
         private async Task<bool> SaveAsync(StorageFolder folder)
         {
             Task<String> contentTask = SerializeToStringAsync();
-            String fileName = CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
-            StorageFile targetFile = await folder.CreateFileAsync(fileName, CreationCollisionOption.OpenIfExists);
+            StorageFile targetFile = await folder.CreateFileAsync(FileName, CreationCollisionOption.OpenIfExists);
             BasicProperties targetFileProperties = await targetFile.GetBasicPropertiesAsync();
             // New file, write directly
             if (targetFileProperties.Size == 0)
@@ -357,15 +371,15 @@ namespace DrawToNote.Datas
                 await FileIO.WriteTextAsync(targetFile, await contentTask);
                 return true;
             }
-            // Old file, create a backup file to write and then replace the origion file
+            // Old file, create a backup file to write and then replace the origin file
             else
             {
-                String backupFileName = fileName + ".bak";
+                String backupFileName = FileName + ".bak";
                 StorageFile backupFile = await folder.CreateFileAsync(backupFileName, CreationCollisionOption.ReplaceExisting);
 
                 await FileIO.WriteTextAsync(backupFile, await contentTask);
                 BasicProperties properties = await backupFile.GetBasicPropertiesAsync();
-                // write successful, replace the origion file
+                // write successful, replace the origin file
                 if (properties.Size > 0)
                 {
                     try
@@ -373,8 +387,13 @@ namespace DrawToNote.Datas
                         await backupFile.MoveAndReplaceAsync(targetFile);
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        MetroEventSource.Instance.Error(String.Format(
+                            "Something really bad happend while moving {0} to {1}: {2}",
+                            backupFileName,
+                            FileName,
+                            ex.Message));
                         return false;
                     }
                 }

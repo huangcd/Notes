@@ -113,6 +113,7 @@
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\MetroEventSource.cs" />
+    <Compile Include="Common\StorageFileEventListener.cs" />
     <Compile Include="Datas\DefaultValue.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Datas\Char.cs" />
@@ -155,10 +156,7 @@
     </AppxManifest>
     <None Include="Common\Design.cd" />
     <None Include="MultilingualResources\Chinese %28Simplified%29.xlf" />
-    <None Include="MultilingualResources\Chinese %28Traditional%29.xlf" />
     <None Include="MultilingualResources\English.xlf" />
-    <None Include="MultilingualResources\French.xlf" />
-    <None Include="MultilingualResources\Pseudo Language %28Pseudo%29.xlf" />
     <None Include="Notes_StoreKey.pfx" />
     <None Include="Notes_TemporaryKey.pfx" />
     <None Include="packages.config">

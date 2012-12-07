@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="27805HUANGCD.DrawToNote" Publisher="CN=6FC72C23-D8AC-4EE2-B49E-DFC07295D5E4" Version="1.1.0.7" />
+  <Identity Name="27805HUANGCD.DrawToNote" Publisher="CN=6FC72C23-D8AC-4EE2-B49E-DFC07295D5E4" Version="1.1.0.8" />
   <Properties>
     <DisplayName>Draw To Note</DisplayName>
     <PublisherDisplayName>HUANGCD</PublisherDisplayName>
@@ -12,7 +12,6 @@
   </Prerequisites>
   <Resources>
     <Resource Language="en-US" />
-    <Resource Language="zh-CN" />
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Notes.App">
