@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Callisto.Controls;
 using DrawToNote.Common;
 using DrawToNote.Datas;
@@ -30,10 +31,7 @@ namespace DrawToNote.Pages
         #region datas
 
         private List<Stroke> _strokeCached = new List<Stroke>();
-        private Button clearButton;
-        private Button confirmButton;
         private Point currentPoint;
-        private bool inSpecialRegion = false;
         private uint penId;
         private Point previousPoint;
         private ScriptManager scriptManager = ScriptManager.Instance;
@@ -52,50 +50,6 @@ namespace DrawToNote.Pages
                     return;
                 }
                 DefaultValue.DefaultLineWidth = value;
-            }
-        }
-
-        private Button ClearButton
-        {
-            get
-            {
-                if (clearButton == null)
-                {
-                    clearButton = new Button
-                    {
-                        Style = (Style)Resources["ClearCharButtonStyle"],
-                        Width = 100,
-                        Height = 80,
-                    };
-                    clearButton.Click += ClearButton_Click;
-                    clearButton.PointerExited += ClearButton_PointerExited;
-                    clearButton.PointerEntered += ClearButton_PointerEntered;
-                }
-                Size size = DrawPad.RenderSize;
-                clearButton.Margin = new Thickness(0, size.Height - clearButton.Height, 0, 0);
-                return clearButton;
-            }
-        }
-
-        private Button ConfirmButton
-        {
-            get
-            {
-                if (confirmButton == null)
-                {
-                    confirmButton = new Button
-                    {
-                        Style = (Style)Resources["ConfirmCharButtonStyle"],
-                        Width = 100,
-                        Height = 80,
-                    };
-                    confirmButton.Click += ConfirmButton_Click;
-                    confirmButton.PointerEntered += ConfirmButton_PointerEntered;
-                    confirmButton.PointerExited += ConfirmButton_PointerExited;
-                }
-                Size size = DrawPad.RenderSize;
-                confirmButton.Margin = new Thickness(size.Width - confirmButton.Width - 5, size.Height - confirmButton.Height, 0, 0);
-                return confirmButton;
             }
         }
 
@@ -118,6 +72,11 @@ namespace DrawToNote.Pages
             this.InitializeComponent();
             HandleEvents();
             HandleResource();
+            CheckDefaultColorButton();
+        }
+
+        private void CheckDefaultColorButton()
+        {
             var buttons = LeftTopCommands.Children.Where(
                 x => x is ColoredRectangleButton && (x as ColoredRectangleButton).ButtonColor.Color == DefaultValue.DefaultLineColor
                 ).ToList();
@@ -125,7 +84,6 @@ namespace DrawToNote.Pages
             {
                 (buttons[0] as ColoredRectangleButton).Checked = true;
             }
-            // BlackColoredRectangleButton.Checked = true;
         }
 
         protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
@@ -147,8 +105,6 @@ namespace DrawToNote.Pages
         private void ClearDrawPad()
         {
             DrawPad.Children.Clear();
-            DrawPad.Children.Add(ConfirmButton);
-            DrawPad.Children.Add(ClearButton);
         }
 
         private void ClearInkStrokes()
@@ -179,11 +135,16 @@ namespace DrawToNote.Pages
 
         #region actions
 
-        protected override void GoBack(object sender, RoutedEventArgs e)
+        protected override async void GoBack(object sender, RoutedEventArgs e)
         {
             NotePad.Clear();
-            scriptManager.CurrentScript.Save();
-            this.Frame.Navigate(typeof(NotesPage), scriptManager.CurrentScript);
+            Script script = scriptManager.CurrentScript;
+            Task task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                script.Save();
+            }).AsTask();
+            this.Frame.Navigate(typeof(NotesPage), script);
+            await task;
         }
 
         protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
@@ -222,7 +183,6 @@ namespace DrawToNote.Pages
             DrawPad.PointerMoved += DrawPad_PointerMoved;
             DrawPad.PointerReleased += DrawPad_PointerReleased;
             DrawPad.PointerExited += DrawPad_PointerExited;
-            DrawPad.PointerEntered += DrawPad_PointerEntered;
 
             //BackButton.Click += BackButton_Click;
             //AppBarSaveButton.Click += AppBarSaveButton_Click;
@@ -270,45 +230,14 @@ namespace DrawToNote.Pages
         {
             ClearDrawPad();
             ClearInkStrokes();
-            LeaveSpecialRegion();
         }
 
-        private void ClearButton_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            EnterSpecialRegion();
-        }
-
-        private void ClearButton_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            LeaveSpecialRegion();
-        }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             scriptManager.ConfirmCharacter(
                 DrawPad.RenderSize, _strokeCached);
             ClearButton_Click(sender, null);
-            LeaveSpecialRegion();
-        }
-
-        private void ConfirmButton_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            EnterSpecialRegion();
-        }
-
-        private void ConfirmButton_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            LeaveSpecialRegion();
-        }
-
-        private void EnterSpecialRegion()
-        {
-            inSpecialRegion = true;
-        }
-
-        private void LeaveSpecialRegion()
-        {
-            inSpecialRegion = false;
         }
 
         #endregion confirmRegion actions
@@ -319,18 +248,6 @@ namespace DrawToNote.Pages
         private double checkDistance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
-        }
-
-        private void DrawPad_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (!DrawPad.Children.Contains(ConfirmButton))
-            {
-                DrawPad.Children.Add(ConfirmButton);
-            }
-            if (!DrawPad.Children.Contains(ClearButton))
-            {
-                DrawPad.Children.Add(ClearButton);
-            }
         }
 
         private void DrawPad_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -370,11 +287,6 @@ namespace DrawToNote.Pages
 
         private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (inSpecialRegion)
-            {
-                return;
-            }
-
             PointerPoint pt = e.GetCurrentPoint(DrawPad);
             previousPoint = pt.Position;
 
@@ -392,15 +304,12 @@ namespace DrawToNote.Pages
                 }
                 catch (Exception ex)
                 {
+                    MetroEventSource.Instance.Error(String.Format("Something bad happend while trigger scriptManager.ProcessPointerDown function: {0}", ex.Message));
                 }
             }
             else if (deviceType == PointerDeviceType.Mouse && pt.Properties.IsRightButtonPressed)
             {
                 // Right Click
-            }
-            else if (deviceType == PointerDeviceType.Touch)
-            {
-                // Touch
             }
         }
 

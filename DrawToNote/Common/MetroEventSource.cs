@@ -18,12 +18,6 @@ namespace DrawToNote.Common
             }
         }
 
-        [Event(0, Level = EventLevel.LogAlways)]
-        public void LogAlways(string message)
-        {
-            this.WriteEvent(0, message);
-        }
-
         [Event(1, Level = EventLevel.Verbose)]
         public void Debug(string message)
         {
@@ -53,6 +47,5 @@ namespace DrawToNote.Common
         {
             this.WriteEvent(5, message);
         }
-
     }
 }

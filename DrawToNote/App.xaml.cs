@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Tracing;
 using System.Threading.Tasks;
 using DrawToNote.Common;
 using DrawToNote.Datas;
@@ -33,6 +34,16 @@ namespace DrawToNote
             this.Suspending += OnSuspending;
         }
 
+        private static void InitEventHandler()
+        {
+            // First time execution, initialize the logger 
+            EventListener verboseListener = new StorageFileEventListener("Log");
+            EventListener informationListener = new StorageFileEventListener("Warning");
+
+            verboseListener.EnableEvents(MetroEventSource.Instance, EventLevel.Verbose);
+            informationListener.EnableEvents(MetroEventSource.Instance, EventLevel.Informational);
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -41,7 +52,8 @@ namespace DrawToNote
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            SettingsPane.GetForCurrentView().CommandsRequested += SettingPaneCommandsRequested;
+            //SettingsPane.GetForCurrentView().CommandsRequested += SettingPaneCommandsRequested;
+            InitEventHandler();
 
             _rootFrame = Window.Current.Content as Frame;
             if (_rootFrame == null)
@@ -127,7 +139,7 @@ namespace DrawToNote
             {
                 // First Time
                 setting.Values["AppHasBeenStarted"] = "AppHasBeenStarted";
-                ScriptManager.Instance.Add(Script.LoadAsync(HowToUse.Data));
+                // ScriptManager.Instance.Add(Script.LoadAsync(HowToUse.Data));
             }
             await ScriptManager.Instance.LoadScriptsAsync();
             RemoveSplash();
