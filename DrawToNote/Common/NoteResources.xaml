@@ -73,7 +73,7 @@
 
     <DataTemplate x:Key="StandardScriptTemplate">
         <StackPanel Orientation="Vertical" Width="250" Height="250" Background="Black">
-            <pages:ScrollScriptView
+            <pages:ScriptView
                 Height="150"
                 Width="250"
                 CharacterHeight="20"

@@ -143,8 +143,8 @@
       <DependentUpon>Splash.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Pages\ScrollScriptView.xaml.cs">
-      <DependentUpon>ScrollScriptView.xaml</DependentUpon>
+    <Compile Include="Pages\ScriptView.xaml.cs">
+      <DependentUpon>ScriptView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ScriptSearchResultPage.xaml.cs">
       <DependentUpon>ScriptSearchResultPage.xaml</DependentUpon>
@@ -204,7 +204,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Pages\ScrollScriptView.xaml">
+    <Page Include="Pages\ScriptView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

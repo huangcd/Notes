@@ -76,6 +76,28 @@
                     x:Name="DrawPad"
                     Margin="20, 20, 20, 20"
                     Background="{StaticResource ScriptBackground}" />
+            <Button x:Name="ClearButton_"
+                    Grid.Row="1" 
+                    Grid.Column="1" 
+                    Style="{StaticResource ClearCharButtonStyle}"
+                    Width="100"
+                    Height="80"
+                    Click="ClearButton_Click"
+                     HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Margin="20, 20, 20, 20">
+            </Button>
+            <Button x:Name="ConfirmButton_"
+                    Grid.Row="1" 
+                    Grid.Column="1" 
+                    Style="{StaticResource ConfirmCharButtonStyle}"
+                    Width="100"
+                    Height="80"
+                    Click="ConfirmButton_Click"
+                     HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="20, 20, 20, 20">
+            </Button>
             <ScrollViewer Grid.Column="0"
                           Grid.RowSpan="2"
                           HorizontalAlignment="Stretch"
@@ -85,7 +107,7 @@
                           HorizontalScrollMode="Disabled"
                           Margin="20, 20, 20, 20"
                           x:Name="scrollViewer">
-                <pages:ScrollScriptView Grid.Column="0"
+                <pages:ScriptView Grid.Column="0"
                                     x:Name="NotePad"
                                     Foreground="Black"
                                     LineWidth="8"
@@ -362,6 +384,34 @@
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.Column)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Int32>0</x:Int32>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnSpan)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Int32>1</x:Int32>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="ConfirmButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0,0,10,0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="FullScreenPortrait">
@@ -566,6 +616,27 @@
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
                                     <Thickness>5,10,5,10</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>20,0,0,20</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.Column)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Int32>0</x:Int32>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.ColumnSpan)" Storyboard.TargetName="ClearButton_">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <x:Int32>1</x:Int32>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>

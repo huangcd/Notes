@@ -14,36 +14,36 @@ using Windows.UI.Xaml.Shapes;
 
 namespace DrawToNote.Pages
 {
-    public sealed partial class ScrollScriptView : UserControl
+    public sealed partial class ScriptView : UserControl
     {
         private const double ScaleConstance = 1.2;
 
         #region Properties
 
         private readonly DependencyProperty CharacterHeightProperty =
-            DependencyProperty.Register("CharacterHeight", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(20));
+            DependencyProperty.Register("CharacterHeight", typeof(double), typeof(ScriptView), new PropertyMetadata(20));
 
         private readonly DependencyProperty CharacterWidthProperty =
-             DependencyProperty.Register("CharacterWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(20));
+             DependencyProperty.Register("CharacterWidth", typeof(double), typeof(ScriptView), new PropertyMetadata(20));
 
         private readonly DependencyProperty CanvasBackgroundProperty =
-             DependencyProperty.Register("CanvasBackground", typeof(Brush), typeof(ScrollScriptView), new PropertyMetadata(null));
+             DependencyProperty.Register("CanvasBackground", typeof(Brush), typeof(ScriptView), new PropertyMetadata(null));
 
         private readonly DependencyProperty CharactersProperty =
             DependencyProperty.Register("Characters",
             typeof(ObservableCollection<Char>),
-            typeof(ScrollScriptView),
+            typeof(ScriptView),
             new PropertyMetadata(new ObservableCollection<Char>(), OnCharactersChanged));
 
         private readonly DependencyProperty SnapshotProperty =
             DependencyProperty.Register("Snapshot",
             typeof(bool),
-            typeof(ScrollScriptView),
+            typeof(ScriptView),
             new PropertyMetadata(false));
 
         private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ScrollScriptView container = d as ScrollScriptView;
+            ScriptView container = d as ScriptView;
             (e.OldValue as ObservableCollection<Char>).CollectionChanged -= container.BindingScript_ScriptChanged;
             (e.NewValue as ObservableCollection<Char>).CollectionChanged += container.BindingScript_ScriptChanged;
             if (container.Snapshot)
@@ -53,7 +53,7 @@ namespace DrawToNote.Pages
         }
 
         private readonly DependencyProperty ThicknessProperty =
-            DependencyProperty.Register("LineWidth", typeof(double), typeof(ScrollScriptView), new PropertyMetadata(DefaultValue.DefaultLineWidth));
+            DependencyProperty.Register("LineWidth", typeof(double), typeof(ScriptView), new PropertyMetadata(DefaultValue.DefaultLineWidth));
 
         public bool Snapshot
         {
@@ -155,7 +155,7 @@ namespace DrawToNote.Pages
 
         #endregion Properties
 
-        public ScrollScriptView()
+        public ScriptView()
         {
             this.InitializeComponent();
             Characters.CollectionChanged += BindingScript_ScriptChanged;
