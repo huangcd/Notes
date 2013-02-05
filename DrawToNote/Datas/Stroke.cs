@@ -132,17 +132,17 @@ namespace DrawToNote.Datas
 
     public static class JsonExtension
     {
-        public static string ToJson(this double val)
+        public static string ToJson(this double value)
         {
-            return string.Format("{0:0.00}", val);
+            return string.Format("{0:0.00}", value);
         }
 
-        public static string ToJson(this BezierSegment val)
+        public static string ToJson(this BezierSegment value)
         {
             return string.Join(",",
-                val.Point1.X.ToJson(), val.Point1.Y.ToJson(),
-                val.Point2.X.ToJson(), val.Point2.Y.ToJson(),
-                val.Point3.X.ToJson(), val.Point3.Y.ToJson());
+                value.Point1.X.ToJson(), value.Point1.Y.ToJson(),
+                value.Point2.X.ToJson(), value.Point2.Y.ToJson(),
+                value.Point3.X.ToJson(), value.Point3.Y.ToJson());
         }
     }
 }

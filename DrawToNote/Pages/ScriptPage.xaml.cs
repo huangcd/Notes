@@ -37,7 +37,7 @@ namespace DrawToNote.Pages
         private ScriptManager scriptManager = ScriptManager.Instance;
         private uint touchId;
 
-        public Double LineThickness
+        public static Double LineThickness
         {
             get
             {
@@ -53,7 +53,7 @@ namespace DrawToNote.Pages
             }
         }
 
-        private SolidColorBrush LineStroke
+        private static SolidColorBrush LineStroke
         {
             get
             {
@@ -114,13 +114,14 @@ namespace DrawToNote.Pages
             _strokeCached.Clear();
         }
 
-        private void ColoredRectangleButton_Check(object sender, DependencyPropertyChangedEventArgs e)
+        private void ColoredRectangleButton_Check(object sender, DependencyPropertyChangedEventArgs args)
         {
             foreach (var child in LeftTopCommands.Children)
             {
-                if (child is ColoredRectangleButton && !child.Equals(sender) && (child as ColoredRectangleButton).Checked)
+                ColoredRectangleButton crb = child as ColoredRectangleButton;
+                if (crb != null && crb.Equals(sender) && crb.Checked)
                 {
-                    (child as ColoredRectangleButton).Checked = false;
+                    crb.Checked = false;
                 }
             }
             LineStroke = (sender as ColoredRectangleButton).ButtonColor;
@@ -135,7 +136,7 @@ namespace DrawToNote.Pages
 
         #region actions
 
-        protected override async void GoBack(object sender, RoutedEventArgs e)
+        protected override async void GoBack(object sender, RoutedEventArgs args)
         {
             NotePad.Clear();
             Script script = scriptManager.CurrentScript;
@@ -147,13 +148,13 @@ namespace DrawToNote.Pages
             await task;
         }
 
-        protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
+        protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs args)
         {
-            base.OnNavigatingFrom(e);
+            base.OnNavigatingFrom(args);
             ScriptManager.Instance.CurrentScript = null;
         }
 
-        private async void AppBarClearButton_Click(object sender, RoutedEventArgs e)
+        private async void AppBarClearButton_Click(object sender, RoutedEventArgs args)
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
@@ -162,7 +163,7 @@ namespace DrawToNote.Pages
                 });
         }
 
-        private async void AppBarDeleteButton_Click(object sender, RoutedEventArgs e)
+        private async void AppBarDeleteButton_Click(object sender, RoutedEventArgs args)
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
@@ -198,42 +199,42 @@ namespace DrawToNote.Pages
         //    ClearInkStrokes();
         //}
 
-        private void LineWidthButton_Click(object sender, RoutedEventArgs e)
+        private void LineWidthButton_Click(object sender, RoutedEventArgs args)
         {
-            Flyout f = new Flyout();
-
-            f.Placement = PlacementMode.Top;
-            f.PlacementTarget = sender as UIElement; // this is an UI element (usually the sender)
-
-            LineWidthSelector selector = new LineWidthSelector();
-            selector.Width = 400;
-            selector.Height = 100;
-
-            f.Content = selector;
-            selector.ValueChanged += (_sender, _e) =>
+            using (Flyout f = new Flyout())
             {
-                LineThickness = _e.NewValue;
-                // NotePad.LineWidth = LineThickness;
-            };
+                f.Placement = PlacementMode.Top;
+                f.PlacementTarget = sender as UIElement; // this is an UI element (usually the sender)
 
-            f.IsOpen = true;
+                LineWidthSelector selector = new LineWidthSelector();
+                selector.Width = 400;
+                selector.Height = 100;
+
+                f.Content = selector;
+                selector.ValueChanged += (_sender, _e) =>
+                {
+                    LineThickness = _e.NewValue;
+                    // NotePad.LineWidth = LineThickness;
+                };
+
+                f.IsOpen = true;
+            }
         }
 
-        private void ScriptTitle_TextChanged(object sender, TextChangedEventArgs e)
+        private void ScriptTitle_TextChanged(object sender, TextChangedEventArgs args)
         {
             scriptManager.CurrentScript.Title = (sender as TextBox).Text;
         }
 
         #region confirmRegion actions
 
-        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        private void ClearButton_Click(object sender, RoutedEventArgs args)
         {
             ClearDrawPad();
             ClearInkStrokes();
         }
 
-
-        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        private void ConfirmButton_Click(object sender, RoutedEventArgs args)
         {
             scriptManager.ConfirmCharacter(
                 DrawPad.RenderSize, _strokeCached);
@@ -245,21 +246,21 @@ namespace DrawToNote.Pages
         #region DrawPad Actions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private double checkDistance(Point p1, Point p2)
+        private static double checkDistance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
 
-        private void DrawPad_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void DrawPad_PointerExited(object sender, PointerRoutedEventArgs args)
         {
-            DrawPad_PointerReleased(sender, e);
+            DrawPad_PointerReleased(sender, args);
         }
 
-        private void DrawPad_PointerMoved(object sender, PointerRoutedEventArgs e)
+        private void DrawPad_PointerMoved(object sender, PointerRoutedEventArgs args)
         {
-            if (e.Pointer.PointerId == penId)
+            if (args.Pointer.PointerId == penId)
             {
-                PointerPoint pt = e.GetCurrentPoint(DrawPad);
+                PointerPoint pt = args.GetCurrentPoint(DrawPad);
                 currentPoint = pt.Position;
 
                 if (checkDistance(currentPoint, previousPoint) > 2)
@@ -280,17 +281,17 @@ namespace DrawToNote.Pages
                     scriptManager.ProcessPointerUpdate(pt);
                 }
             }
-            else if (e.Pointer.PointerId == touchId)
+            else if (args.Pointer.PointerId == touchId)
             {
             }
         }
 
-        private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs e)
+        private void DrawPad_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
-            PointerPoint pt = e.GetCurrentPoint(DrawPad);
+            PointerPoint pt = args.GetCurrentPoint(DrawPad);
             previousPoint = pt.Position;
 
-            PointerDeviceType deviceType = e.Pointer.PointerDeviceType;
+            PointerDeviceType deviceType = args.Pointer.PointerDeviceType;
             if (deviceType == PointerDeviceType.Pen ||
                 (deviceType == PointerDeviceType.Mouse && pt.Properties.IsLeftButtonPressed) ||
                 deviceType == PointerDeviceType.Touch)
@@ -300,7 +301,7 @@ namespace DrawToNote.Pages
                     scriptManager.ProcessPointerDown(pt);
                     penId = pt.PointerId;
 
-                    e.Handled = true;
+                    args.Handled = true;
                 }
                 catch (Exception ex)
                 {
@@ -313,27 +314,27 @@ namespace DrawToNote.Pages
             }
         }
 
-        private void DrawPad_PointerReleased(object sender, PointerRoutedEventArgs e)
+        private void DrawPad_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
-            if (e.Pointer.PointerId == penId)
+            if (args.Pointer.PointerId == penId)
             {
-                PointerPoint pt = e.GetCurrentPoint(DrawPad);
+                PointerPoint pt = args.GetCurrentPoint(DrawPad);
                 scriptManager.ProcessPointerUp(pt);
 
-                InkStroke inkStroke = scriptManager.GetStrokes().Last();
+                InkStroke inkStroke = scriptManager.Strokes.Last();
                 Stroke stroke = new Stroke(inkStroke);
                 stroke.LineWidth = LineThickness;
                 stroke.Brush = LineStroke;
                 RenderStrokeOnDrawPad(stroke);
                 _strokeCached.Add(stroke);
             }
-            else if (e.Pointer.PointerId == touchId)
+            else if (args.Pointer.PointerId == touchId)
             {
                 // Touch
             }
             touchId = 0;
             penId = 0;
-            e.Handled = true;
+            args.Handled = true;
         }
 
         #endregion DrawPad Actions
@@ -357,21 +358,21 @@ namespace DrawToNote.Pages
 
         #region Storyboard
 
-        private void Storyboard_Completed_Filled(object sender, object e)
+        private void Storyboard_Completed_Filled(object sender, object args)
         {
             RePaint(sender);
         }
 
-        private void Storyboard_Completed_Landscape(object sender, object e)
+        private void Storyboard_Completed_Landscape(object sender, object args)
         {
             RePaint(sender);
         }
 
-        private void Storyboard_Completed_Portrait(object sender, object e)
+        private void Storyboard_Completed_Portrait(object sender, object args)
         {
             RePaint(sender);
         }
-        private void Storyboard_Completed_Snapped(object sender, object e)
+        private void Storyboard_Completed_Snapped(object sender, object args)
         {
             RePaint(sender);
         }

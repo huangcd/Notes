@@ -10,20 +10,18 @@ using Windows.UI.Input.Inking;
 
 namespace DrawToNote.Datas
 {
-    public class Char
+    public class Character
     {
-        private static UTF8Encoding encoding = new UTF8Encoding();
-
         [JsonProperty]
         private ObservableCollection<Stroke> strokes = new ObservableCollection<Stroke>();
 
-        public Char(IEnumerable<Stroke> strokes, Size canvasSize)
+        public Character(IEnumerable<Stroke> strokes, Size canvasSize)
         {
             CanvasSize = canvasSize;
             this.strokes = new ObservableCollection<Stroke>(strokes);
         }
 
-        public Char()
+        public Character()
         {
         }
 

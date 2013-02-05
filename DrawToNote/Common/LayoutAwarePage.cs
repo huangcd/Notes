@@ -109,8 +109,8 @@ namespace DrawToNote.Common
         /// <see cref="Frame"/> until it reaches the top of the navigation stack.
         /// </summary>
         /// <param name="sender">Instance that triggered the event.</param>
-        /// <param name="e">Event data describing the conditions that led to the event.</param>
-        protected virtual void GoHome(object sender, RoutedEventArgs e)
+        /// <param name="args">Event data describing the conditions that led to the event.</param>
+        protected virtual void GoHome(object sender, RoutedEventArgs args)
         {
             // Use the navigation frame to return to the topmost page
             if (this.Frame != null)
@@ -124,9 +124,9 @@ namespace DrawToNote.Common
         /// associated with this page's <see cref="Frame"/>.
         /// </summary>
         /// <param name="sender">Instance that triggered the event.</param>
-        /// <param name="e">Event data describing the conditions that led to the
+        /// <param name="args">Event data describing the conditions that led to the
         /// event.</param>
-        protected virtual void GoBack(object sender, RoutedEventArgs e)
+        protected virtual void GoBack(object sender, RoutedEventArgs args)
         {
             // Use the navigation frame to return to the previous page
             if (this.Frame != null && this.Frame.CanGoBack) this.Frame.GoBack();
@@ -137,9 +137,9 @@ namespace DrawToNote.Common
         /// associated with this page's <see cref="Frame"/>.
         /// </summary>
         /// <param name="sender">Instance that triggered the event.</param>
-        /// <param name="e">Event data describing the conditions that led to the
+        /// <param name="args">Event data describing the conditions that led to the
         /// event.</param>
-        protected virtual void GoForward(object sender, RoutedEventArgs e)
+        protected virtual void GoForward(object sender, RoutedEventArgs args)
         {
             // Use the navigation frame to move to the next page
             if (this.Frame != null && this.Frame.CanGoForward) this.Frame.GoForward();
@@ -228,7 +228,7 @@ namespace DrawToNote.Common
         /// </summary>
         /// <param name="sender">Instance of <see cref="Control"/> that supports visual state
         /// management corresponding to view states.</param>
-        /// <param name="e">Event data that describes how the request was made.</param>
+        /// <param name="args">Event data that describes how the request was made.</param>
         /// <remarks>The current view state will immediately be used to set the corresponding
         /// visual state when layout updates are requested.  A corresponding
         /// <see cref="FrameworkElement.Unloaded"/> event handler connected to
@@ -237,7 +237,7 @@ namespace DrawToNote.Common
         /// Unloaded events.</remarks>
         /// <seealso cref="DetermineVisualState"/>
         /// <seealso cref="InvalidateVisualState"/>
-        public void StartLayoutUpdates(object sender, RoutedEventArgs e)
+        public void StartLayoutUpdates(object sender, RoutedEventArgs args)
         {
             var control = sender as Control;
             if (control == null) return;
@@ -253,7 +253,7 @@ namespace DrawToNote.Common
             VisualStateManager.GoToState(control, DetermineVisualState(ApplicationView.Value), false);
         }
 
-        private void WindowSizeChanged(object sender, WindowSizeChangedEventArgs e)
+        private void WindowSizeChanged(object sender, WindowSizeChangedEventArgs args)
         {
             this.InvalidateVisualState();
         }
@@ -265,11 +265,11 @@ namespace DrawToNote.Common
         /// </summary>
         /// <param name="sender">Instance of <see cref="Control"/> that supports visual state
         /// management corresponding to view states.</param>
-        /// <param name="e">Event data that describes how the request was made.</param>
+        /// <param name="args">Event data that describes how the request was made.</param>
         /// <remarks>The current view state will immediately be used to set the corresponding
         /// visual state when layout updates are requested.</remarks>
         /// <seealso cref="StartLayoutUpdates"/>
-        public void StopLayoutUpdates(object sender, RoutedEventArgs e)
+        public void StopLayoutUpdates(object sender, RoutedEventArgs args)
         {
             var control = sender as Control;
             if (control == null || this._layoutAwareControls == null) return;
@@ -326,9 +326,9 @@ namespace DrawToNote.Common
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
         /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.  The Parameter
+        /// <param name="args">Event data that describes how this page was reached.  The Parameter
         /// property provides the group to be displayed.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             // Returning to a cached page through navigation shouldn't trigger state loading
             if (this._pageKey != null) return;
@@ -336,7 +336,7 @@ namespace DrawToNote.Common
             var frameState = SuspensionManager.SessionStateForFrame(this.Frame);
             this._pageKey = "Page-" + this.Frame.BackStackDepth;
 
-            if (e.NavigationMode == NavigationMode.New)
+            if (args.NavigationMode == NavigationMode.New)
             {
                 // Clear existing state for forward navigation when adding a new page to the
                 // navigation stack
@@ -349,23 +349,23 @@ namespace DrawToNote.Common
                 }
 
                 // Pass the navigation parameter to the new page
-                this.LoadState(e.Parameter, null);
+                this.LoadState(args.Parameter, null);
             }
             else
             {
                 // Pass the navigation parameter and preserved page state to the page, using
                 // the same strategy for loading suspended state and recreating pages discarded
                 // from cache
-                this.LoadState(e.Parameter, (Dictionary<String, Object>)frameState[this._pageKey]);
+                this.LoadState(args.Parameter, (Dictionary<String, Object>)frameState[this._pageKey]);
             }
         }
 
         /// <summary>
         /// Invoked when this page will no longer be displayed in a Frame.
         /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.  The Parameter
+        /// <param name="args">Event data that describes how this page was reached.  The Parameter
         /// property provides the group to be displayed.</param>
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
             var frameState = SuspensionManager.SessionStateForFrame(this.Frame);
             var pageState = new Dictionary<String, Object>();

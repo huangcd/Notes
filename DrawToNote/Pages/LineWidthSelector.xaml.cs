@@ -17,12 +17,12 @@ namespace DrawToNote.Pages
             LineWidthSlider.ValueChanged += LineWidthSlider_ValueChanged;
         }
 
-        private void LineWidthSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        private void LineWidthSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs args)
         {
             var eventHandler = this.ValueChanged;
             if (eventHandler != null)
             {
-                eventHandler(this, e);
+                eventHandler(this, args);
             }
         }
     }

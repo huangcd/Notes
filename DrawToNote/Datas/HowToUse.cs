@@ -4,7 +4,7 @@ namespace DrawToNote.Datas
 {
     public static class HowToUse
     {
-        public static String Data =
+        public const String Data =
             @"{
   ""_createDate"": ""2012-11-08T22:16:10.5217522+08:00"",
   ""_characters"": [

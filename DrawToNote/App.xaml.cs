@@ -23,6 +23,8 @@ namespace DrawToNote
     sealed partial class App : Application
     {
         private Frame _rootFrame;
+        private EventListener verboseListener;
+        private EventListener informationListener;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -34,11 +36,11 @@ namespace DrawToNote
             this.Suspending += OnSuspending;
         }
 
-        private static void InitEventHandler()
+        private void InitEventHandler()
         {
             // First time execution, initialize the logger 
-            EventListener verboseListener = new StorageFileEventListener("Log");
-            EventListener informationListener = new StorageFileEventListener("Warning");
+            verboseListener = new StorageFileEventListener("Log");
+            informationListener = new StorageFileEventListener("Warning");
 
             verboseListener.EnableEvents(MetroEventSource.Instance, EventLevel.Verbose);
             informationListener.EnableEvents(MetroEventSource.Instance, EventLevel.Informational);
@@ -52,7 +54,7 @@ namespace DrawToNote
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            //SettingsPane.GetForCurrentView().CommandsRequested += SettingPaneCommandsRequested;
+            SettingsPane.GetForCurrentView().CommandsRequested += SettingPaneCommandsRequested;
             InitEventHandler();
 
             _rootFrame = Window.Current.Content as Frame;
@@ -160,6 +162,15 @@ namespace DrawToNote
             if (ScriptManager.Instance.CurrentScript != null)
             {
                 ScriptManager.Instance.CurrentScript.Save();
+            }
+
+            if (verboseListener != null)
+            {
+                verboseListener.Dispose();
+            }
+            if (informationListener != null)
+            {
+                informationListener.Dispose();
             }
 
             deferral.Complete();

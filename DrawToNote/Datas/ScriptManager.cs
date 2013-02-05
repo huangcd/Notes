@@ -149,7 +149,7 @@ namespace DrawToNote.Datas
         /// <returns></returns>
         public void ConfirmCharacter(Size canvasSize, List<Stroke> strokes)
         {
-            Char chr = new Char(strokes, canvasSize);
+            Character chr = new Character(strokes, canvasSize);
             CurrentScript.Add(chr);
         }
 
@@ -179,7 +179,7 @@ namespace DrawToNote.Datas
             {
                 try
                 {
-                    if (!file.Name.EndsWith(Script.FileSufix))
+                    if (!file.Name.EndsWith(Script.FILE_SURFIX))
                     {
                         continue;
                     }
@@ -256,9 +256,12 @@ namespace DrawToNote.Datas
 
         #region event handler
 
-        public IReadOnlyList<InkStroke> GetStrokes()
+        public IReadOnlyList<InkStroke> Strokes
         {
-            return _inkManager.GetStrokes();
+            get
+            {
+                return _inkManager.GetStrokes();
+            }
         }
 
         public void ProcessPointerDown(PointerPoint pointerPoint)

@@ -249,8 +249,13 @@ namespace DrawToNote.Common
         {
         }
 
-        public SuspensionManagerException(Exception e)
-            : base("SuspensionManager failed", e)
+        public SuspensionManagerException(Exception innerException)
+            : base("Suspension Manager failed", innerException)
+        {
+        }
+
+        public SuspensionManagerException(String message)
+            : base(message)
         {
         }
     }

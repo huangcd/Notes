@@ -31,9 +31,9 @@ namespace DrawToNote.Pages
 
         private readonly DependencyProperty CharactersProperty =
             DependencyProperty.Register("Characters",
-            typeof(ObservableCollection<Char>),
+            typeof(ObservableCollection<Character>),
             typeof(ScriptView),
-            new PropertyMetadata(new ObservableCollection<Char>(), OnCharactersChanged));
+            new PropertyMetadata(new ObservableCollection<Character>(), OnCharactersChanged));
 
         private readonly DependencyProperty SnapshotProperty =
             DependencyProperty.Register("Snapshot",
@@ -44,8 +44,8 @@ namespace DrawToNote.Pages
         private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ScriptView container = d as ScriptView;
-            (e.OldValue as ObservableCollection<Char>).CollectionChanged -= container.BindingScript_ScriptChanged;
-            (e.NewValue as ObservableCollection<Char>).CollectionChanged += container.BindingScript_ScriptChanged;
+            (e.OldValue as ObservableCollection<Character>).CollectionChanged -= container.BindingScript_ScriptChanged;
+            (e.NewValue as ObservableCollection<Character>).CollectionChanged += container.BindingScript_ScriptChanged;
             if (container.Snapshot)
             {
                 container.Repaint();
@@ -87,11 +87,11 @@ namespace DrawToNote.Pages
             }
         }
 
-        public ObservableCollection<Char> Characters
+        public ObservableCollection<Character> Characters
         {
             get
             {
-                return (ObservableCollection<Char>)GetValue(CharactersProperty);
+                return (ObservableCollection<Character>)GetValue(CharactersProperty);
             }
             set
             {
@@ -184,7 +184,7 @@ namespace DrawToNote.Pages
         }
 
         private void CalcScaleInformation(
-            Char chr,
+            Character chr,
             Size charSize,
             int index,
             out double shiftX,
@@ -285,7 +285,7 @@ namespace DrawToNote.Pages
         {
             foreach (var item in items)
             {
-                foreach (var stroke in (item as Char).Strokes)
+                foreach (var stroke in (item as Character).Strokes)
                 {
                     ScrollCanvas.Children.Remove(GetPath(stroke));
                 }
@@ -294,11 +294,11 @@ namespace DrawToNote.Pages
 
         private void CharAdded(int index)
         {
-            Char chr = Characters[index];
+            Character chr = Characters[index];
             RenderCharacter(index, chr);
         }
 
-        private void RenderCharacter(int index, Char chr)
+        private void RenderCharacter(int index, Character chr)
         {
             double shiftX;
             double shiftY;

@@ -20,25 +20,25 @@ namespace DrawToNote.Datas
 {
     public class Script : BindableBase, IComparable<Script>
     {
-        public const String FileSufix = ".js";
-        private const double ScaleConstance = 1.2;
+        internal const String FILE_SURFIX                 = ".js";
+        private const double SCALE_CONSTANCE              = 1.2;
         private static readonly DateTimeFormatter datefmt = new DateTimeFormatter("shortdate");
-        private readonly static object LockObject = new object();
+        private readonly static object LockObject         = new object();
         private static readonly DateTimeFormatter timefmt = new DateTimeFormatter("shorttime");
-        private static UTF8Encoding encoding = new UTF8Encoding();
+        private static UTF8Encoding encoding              = new UTF8Encoding();
 
         // This must be the first field to store
         [JsonProperty("_createDate")]
-        private DateTime _____createDate = DateTime.Now;
+        private DateTime _____createDate                  = DateTime.Now;
 
         [JsonProperty]
-        private ObservableCollection<Char> _characters = new ObservableCollection<Char>();
+        private ObservableCollection<Character> _characters    = new ObservableCollection<Character>();
 
         [JsonProperty]
-        private DateTime _lastModifyDate = DateTime.Now;
+        private DateTime _lastModifyDate                  = DateTime.Now;
 
         [JsonProperty]
-        private String _title = StringProvider.GetValue("NewScriptName");
+        private String _title                             = StringProvider.GetValue("NewScriptName");
 
         public Script()
         {
@@ -48,7 +48,7 @@ namespace DrawToNote.Datas
         public event NotifyCollectionChangedEventHandler ScriptChanged;
 
         [JsonIgnore]
-        public ObservableCollection<Char> Characters
+        public ObservableCollection<Character> Characters
         {
             get
             {
@@ -66,7 +66,7 @@ namespace DrawToNote.Datas
         }
 
         [JsonIgnore]
-        public String CreateDateStr
+        public String CreateDateString
         {
             get
             {
@@ -75,7 +75,7 @@ namespace DrawToNote.Datas
         }
 
         [JsonIgnore]
-        public String ModifyDateStr
+        public String ModifyDateString
         {
             get
             {
@@ -134,11 +134,11 @@ namespace DrawToNote.Datas
         {
             get
             {
-                return CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FileSufix;
+                return CreateDate.ToString("MM_dd_yyyy_H-mm-ss") + FILE_SURFIX;
             }
         }
 
-        public Char this[int index]
+        public Character this[int index]
         {
             get
             {
@@ -202,31 +202,39 @@ namespace DrawToNote.Datas
                 (segment["Point2"]["X"] as JValue).Value, (segment["Point3"]["Y"] as JValue).Value);
         }
 
-        public static bool operator !=(Script s1, Script s2)
+        public static bool operator !=(Script first, Script second)
         {
-            return !(s1 == s2);
+            return !(first == second);
         }
 
-        public static bool operator <(Script s1, Script s2)
+        public static bool operator <(Script first, Script second)
         {
-            return s1.LastModifyDate < s2.LastModifyDate;
+            if (second == null)
+            {
+                return false;
+            }
+            if (first == null)
+            {
+                return true;
+            }
+            return first.LastModifyDate < second.LastModifyDate;
         }
 
-        public static bool operator ==(Script s1, Script s2)
+        public static bool operator ==(Script first, Script second)
         {
-            object obj = s1 as object;
-            if (obj == null) return ((s2 as object) == null);
-            return s1.Equals(s2);
+            object obj = first as object;
+            if (obj == null) return ((second as object) == null);
+            return first.Equals(second);
         }
 
-        public static bool operator >(Script s1, Script s2)
+        public static bool operator >(Script first, Script second)
         {
-            return s1.LastModifyDate > s2.LastModifyDate;
+            return first.LastModifyDate > second.LastModifyDate;
         }
 
-        public void Add(Char chr)
+        public void Add(Character character)
         {
-            Characters.Add(chr);
+            Characters.Add(character);
         }
 
         /// <summary>
@@ -264,14 +272,15 @@ namespace DrawToNote.Datas
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Script))
+            Script objAsScript = obj as Script;
+            if (obj == null)
             {
                 return false;
             }
-            return this.CreateDate == (obj as Script).CreateDate;
+            return this.CreateDate == objAsScript.CreateDate;
         }
 
-        public IEnumerator<Char> GetEnumerator()
+        public IEnumerator<Character> GetEnumerator()
         {
             foreach (var chr in Characters)
             {
